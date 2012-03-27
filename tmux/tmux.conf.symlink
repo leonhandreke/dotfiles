@@ -1,0 +1,2 @@
+# screen-style prefix
+set-option -g prefix C-a
