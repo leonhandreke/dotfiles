@@ -1,0 +1,9 @@
+# Just to make sure we're using UTF-8 here
+export LANG="en_US.UTF-8"
+
+# Initialize rvm
+PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
+source .rvm/scripts/rvm
+
+# Gentoo likes to set this to some wonky value - clear it
+export RUBYOPT=""
