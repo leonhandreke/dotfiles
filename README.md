@@ -3,7 +3,7 @@ Kleinmann's dotfiles](https://github.com/kleinmann/dotfiles.git).
 
 ## clone & setup
 	chsh -s `which zsh`
-	git clone  ~/.dotfiles
+	git clone *git repo* ~/.dotfiles
 	cd ~/.dotfiles
   
 ## install rvm
@@ -24,5 +24,12 @@ Kleinmann's dotfiles](https://github.com/kleinmann/dotfiles.git).
 	cd ~/.vim/bundles
 	git clone https://github.com/gmarik/vundle.git vundle
 	vim +BundleInstall +qall
+
+## crypto keys setup
+	export TRUDE="/mnt/TRUDE"
+	ln -s $TRUDE/.pwsafe.dat .pwsafe.dat
+	ln -s $TRUDE/.gnupg/secring.gpg .gnupg/secring.gpg
+	ln -s $TRUDE/.gnupg/trustdb.gpg .gnupg/trustdb.gpg
+	ln -s $TRUDE/.gnupg/pubring.gpg .gnupg/pubring.gpg
 
 ## all done, enjoy working!
