@@ -1,0 +1,16 @@
+[user]
+	name = Leon Handreke
+	email = leonh@ndreke.de
+	signingkey = 02497EB1
+	sign-commits = true
+
+[core]
+	editor = vim
+
+[color]
+	diff = auto
+	status = auto
+	branch = auto
+
+[github]
+	user = leonhandreke
