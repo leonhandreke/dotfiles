@@ -2,23 +2,27 @@ These are my dotfiles. The management system using ruby and rake is heavily insp
 Kleinmann's dotfiles](https://github.com/kleinmann/dotfiles.git).
 
 ## clone & setup
-    chsh -s `which zsh`
-    git clone  ~/.dotfiles
-    cd ~/.dotfiles
+	chsh -s `which zsh`
+	git clone  ~/.dotfiles
+	cd ~/.dotfiles
   
 ## install rvm
-    bash -s stable < <(curl -s https://raw.github.com/wayneeseguin/rvm/master/binscripts/rvm-installer)
-    if [[ -s ~/.rvm/scripts/rvm ]] ; then source ~/.rvm/scripts/rvm ; fi
-    rvm get head
-    rvm reload
-    rvm install 1.9.2
-    rvm use 1.9.2 --default
+	bash -s stable < <(curl -s https://raw.github.com/wayneeseguin/rvm/master/binscripts/rvm-installer)
+	if [[ -s ~/.rvm/scripts/rvm ]] ; then source ~/.rvm/scripts/rvm ; fi
+	rvm get head
+	rvm reload
+	rvm install 1.9.2
+	rvm use 1.9.2 --default
 
 ## initialize
-    cd ~/.dotfiles
-    rake install
-    cd ~/.vim/bundles
-    git clone https://github.com/gmarik/vundle.git vundle
-    vim +BundleInstall +qall
+	# Install a decent zshrc
+	wget -O .zshrc http://git.grml.org/f/grml-etc-core/etc/zsh/zshrc
+	# Symlink all dotfiles
+	cd ~/.dotfiles
+	rake install
+	# Install vim bundles
+	cd ~/.vim/bundles
+	git clone https://github.com/gmarik/vundle.git vundle
+	vim +BundleInstall +qall
 
 ## all done, enjoy working!
