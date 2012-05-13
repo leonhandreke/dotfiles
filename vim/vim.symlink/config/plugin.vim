@@ -27,3 +27,5 @@ let g:Powerline_symbols = 'fancy'
 " Indent Guides
 let g:indent_guides_enable_on_vim_startup=1
 
+" Disable folding in markdown files
+" let g:pandoc_no_folding = 1
