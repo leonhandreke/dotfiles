@@ -7,3 +7,6 @@ source .rvm/scripts/rvm
 
 # Gentoo likes to set this to some wonky value - clear it
 export RUBYOPT=""
+
+# Append some useful paths to the PATH
+PATH=$HOME/.bin:/sbin:$PATH
