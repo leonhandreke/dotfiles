@@ -6,5 +6,5 @@ set list
 set t_Co=256
 
 " Adjust the color scheme for a dark background
-set bg=dark
-colorscheme jellybeans
+set background=dark
+colorscheme solarized
