@@ -20,7 +20,6 @@ Bundle 'nathanaelkane/vim-indent-guides'
 Bundle 'Lokaltog/vim-powerline'
 Bundle 'Townk/vim-autoclose'
 Bundle 'vim-pandoc/vim-pandoc'
-Bundle 'altercation/vim-colors-solarized'
 Bundle 'rosstimson/scala-vim-support'
 
 Bundle 'ack.vim'
