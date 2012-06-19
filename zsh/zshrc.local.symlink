@@ -1,5 +1,6 @@
 # Just to make sure we're using UTF-8 here
 export LANG="en_US.UTF-8"
+export LC_ALL="en_US.UTF-8"
 
 # Initialize rvm
 PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
@@ -10,3 +11,8 @@ export RUBYOPT=""
 
 # Append some useful paths to the PATH
 PATH=$HOME/.bin:/sbin:$PATH
+
+# Mac OS X-specific configuration for MacVim
+if [[ `uname` -eq "Darwin" ]]; then
+	alias vim="mvim -v"
+fi
