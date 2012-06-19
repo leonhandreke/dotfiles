@@ -16,7 +16,7 @@ Kleinmann's dotfiles](https://github.com/kleinmann/dotfiles.git).
 
 ## initialize
 	# Install a decent zshrc
-	wget -O .zshrc http://git.grml.org/f/grml-etc-core/etc/zsh/zshrc
+	wget -O ~/.zshrc http://git.grml.org/f/grml-etc-core/etc/zsh/zshrc
 	# Symlink all dotfiles
 	cd ~/.dotfiles
 	rake install
