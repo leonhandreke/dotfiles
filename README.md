@@ -11,8 +11,8 @@ Kleinmann's dotfiles](https://github.com/kleinmann/dotfiles.git).
 	if [[ -s ~/.rvm/scripts/rvm ]] ; then source ~/.rvm/scripts/rvm ; fi
 	rvm get head
 	rvm reload
-	rvm install 1.9.2
-	rvm use 1.9.2 --default
+	rvm install 1.9.3
+	rvm use 1.9.3 --default
 
 ## initialize
 	# Install a decent zshrc
