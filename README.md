@@ -21,7 +21,7 @@ Kleinmann's dotfiles](https://github.com/kleinmann/dotfiles.git).
 	cd ~/.dotfiles
 	rake install
 	# Install vim bundles
-	cd ~/.vim/bundles
+	cd ~/.vim/bundle
 	git clone https://github.com/gmarik/vundle.git vundle
 	vim +BundleInstall +qall
 
