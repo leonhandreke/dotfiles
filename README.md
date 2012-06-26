@@ -3,7 +3,7 @@ Kleinmann's dotfiles](https://github.com/kleinmann/dotfiles.git).
 
 ## clone & setup
 	chsh -s `which zsh`
-	git clone *git repo* ~/.dotfiles
+	git clone git://github.com/leonhandreke/dotfiles.git ~/.dotfiles
 	cd ~/.dotfiles
   
 ## install rvm
