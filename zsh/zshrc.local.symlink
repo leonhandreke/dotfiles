@@ -10,7 +10,7 @@ source .rvm/scripts/rvm
 export RUBYOPT=""
 
 # Append some useful paths to the PATH
-PATH=$HOME/.bin:/sbin:$PATH
+PATH=$HOME/.bin:/sbin:/usr/local/sbin:$PATH
 
 # Mac OS X-specific configuration for MacVim
 if [[ `uname` -eq "Darwin" ]]; then
