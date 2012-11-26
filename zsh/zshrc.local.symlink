@@ -13,6 +13,6 @@ export RUBYOPT=""
 PATH=$HOME/.bin:/sbin:/usr/local/sbin:$PATH
 
 # Mac OS X-specific configuration for MacVim
-if [[ `uname` -eq "Darwin" ]]; then
+if [[ `uname` == "Darwin" ]]; then
 	alias vim="mvim -v"
 fi
