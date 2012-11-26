@@ -16,3 +16,7 @@ PATH=$HOME/.bin:/sbin:/usr/local/sbin:$PATH
 if [[ `uname` == "Darwin" ]]; then
 	alias vim="mvim -v"
 fi
+
+if [[ -n `command -v "subl"` ]]; then
+	export EDITOR="subl"
+fi
