@@ -21,6 +21,7 @@ Bundle 'Lokaltog/vim-powerline'
 Bundle 'Townk/vim-autoclose'
 Bundle 'vim-pandoc/vim-pandoc'
 Bundle 'rosstimson/scala-vim-support'
+Bundle 'lukerandall/haskellmode-vim'
 
 Bundle 'ack.vim'
 Bundle 'L9'

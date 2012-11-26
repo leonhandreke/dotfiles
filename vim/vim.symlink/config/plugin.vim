@@ -29,3 +29,6 @@ let g:indent_guides_enable_on_vim_startup=1
 
 " Disable folding in markdown files
 " let g:pandoc_no_folding = 1
+" Configure browser for haskell_doc.vim
+let g:haddock_browser = "open"
+let g:haddock_browser_callformat = "%s %s"
