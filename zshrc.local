@@ -2,13 +2,6 @@
 export LANG="en_US.UTF-8"
 export LC_ALL="en_US.UTF-8"
 
-# Initialize rvm
-PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
-source ~/.rvm/scripts/rvm
-
-# Gentoo likes to set this to some wonky value - clear it
-export RUBYOPT=""
-
 # Append some useful paths to the PATH
 PATH=$HOME/.bin:/sbin:/usr/local/sbin:/usr/local/share/npm/bin:/usr/local/share/python3:$PATH
 
@@ -18,7 +11,7 @@ if [[ `uname` == "Darwin" ]]; then
 fi
 
 # https://github.com/defunkt/hub
-eval "$(hub alias -s)"
+# eval "$(hub alias -s)"
 
 # Don't make yum ask
 alias "yum install"="yum install -y"
