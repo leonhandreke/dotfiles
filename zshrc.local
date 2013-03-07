@@ -10,13 +10,21 @@ source ~/.rvm/scripts/rvm
 export RUBYOPT=""
 
 # Append some useful paths to the PATH
-PATH=$HOME/.bin:/sbin:/usr/local/sbin:$PATH
+PATH=$HOME/.bin:/sbin:/usr/local/sbin:/usr/local/share/npm/bin:/usr/local/share/python3:$PATH
 
 # Mac OS X-specific configuration for MacVim
 if [[ `uname` == "Darwin" ]]; then
 	alias vim="mvim -v"
 fi
 
-if [[ -n `command -v "subl"` ]]; then
-	export EDITOR="subl"
-fi
+# https://github.com/defunkt/hub
+eval "$(hub alias -s)"
+
+# Don't make yum ask
+alias "yum install"="yum install -y"
+
+# Replicate the Mac OS open command
+alias open="xdg-open"
+
+# npm library path
+export NODE_PATH="/usr/local/lib/node"

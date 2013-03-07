@@ -22,6 +22,16 @@ Bundle 'Townk/vim-autoclose'
 Bundle 'vim-pandoc/vim-pandoc'
 Bundle 'rosstimson/scala-vim-support'
 Bundle 'lukerandall/haskellmode-vim'
+Bundle 'digitaltoad/vim-jade'
+Bundle 'vim-scripts/JavaScript-Indent'
+Bundle 'vim-scripts/iptables'
+
+" Autocompletion
+" Bundle 'Valloric/YouCompleteMe'
+" Syntax check
+Bundle 'scrooloose/syntastic'
+
+Bundle 'Glench/Vim-Jinja2-Syntax'
 
 Bundle 'ack.vim'
 Bundle 'L9'

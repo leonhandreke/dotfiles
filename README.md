@@ -1,35 +1,17 @@
-These are my dotfiles. The management system using ruby and rake is heavily inspired by (not to say "copied from") [Uwe
-Kleinmann's dotfiles](https://github.com/kleinmann/dotfiles.git).
+These are my dotfiles. They use the python [`dotfiles`](https://github.com/jbernard/dotfiles/) software as a management system
 
-## clone & setup
-	chsh -s `which zsh`
+## Install required packages
+	aptitude install python-pip zsh vim
+	pip install dotfiles
+
+## Clone & Setup
 	git clone git://github.com/leonhandreke/dotfiles.git ~/.dotfiles
-	cd ~/.dotfiles
-  
-## install rvm
-	bash -s stable < <(curl -s https://raw.github.com/wayneeseguin/rvm/master/binscripts/rvm-installer)
-	if [[ -s ~/.rvm/scripts/rvm ]] ; then source ~/.rvm/scripts/rvm ; fi
-	rvm get head
-	rvm reload
-	rvm install 1.9.3
-	rvm use 1.9.3 --default
+	dotfiles -C ~/.dotfiles/dotfilesrc --sync
 
-## initialize
-	# Install a decent zshrc
-	wget -O ~/.zshrc http://git.grml.org/f/grml-etc-core/etc/zsh/zshrc
-	# Symlink all dotfiles
-	cd ~/.dotfiles
-	rake install
-	# Install vim bundles
+
+## Install vim bundles
 	cd ~/.vim/bundle
 	git clone https://github.com/gmarik/vundle.git vundle
 	vim +BundleInstall +qall
 
-## crypto keys setup
-	export TRUDE="/mnt/TRUDE"
-	ln -s $TRUDE/.pwsafe.dat .pwsafe.dat
-	ln -s $TRUDE/.gnupg/secring.gpg .gnupg/secring.gpg
-	ln -s $TRUDE/.gnupg/trustdb.gpg .gnupg/trustdb.gpg
-	ln -s $TRUDE/.gnupg/pubring.gpg .gnupg/pubring.gpg
-
-## all done, enjoy working!
+## All done, enjoy working!
