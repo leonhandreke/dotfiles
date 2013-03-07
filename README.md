@@ -1,7 +1,7 @@
 These are my dotfiles. They use the python [`dotfiles`](https://github.com/jbernard/dotfiles/) software as a management system
 
 ## Install required packages
-	aptitude install python-pip zsh vim
+	aptitude install python-pip zsh vim git
 	pip install dotfiles
 
 ## Clone & Setup
