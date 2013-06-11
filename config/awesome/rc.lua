@@ -205,7 +205,7 @@ globalkeys = awful.util.table.join(
     -- Standard program
     awful.key({ modkey,           }, "Return", function () awful.util.spawn(terminal) end),
     awful.key({ modkey, "Control" }, "r", awesome.restart),
-    awful.key({ modkey, "Shift"   }, "q", awesome.quit),
+    -- awful.key({ modkey, "Shift"   }, "q", awesome.quit),
 
     awful.key({ modkey,           }, "l",     function () awful.tag.incmwfact( 0.05)    end),
     awful.key({ modkey,           }, "h",     function () awful.tag.incmwfact(-0.05)    end),
@@ -230,7 +230,7 @@ globalkeys = awful.util.table.join(
               end),
 
     awful.key({modkey }, "d", function() awful.util.spawn( "dmenu_run" ) end),
-    awful.key({modkey, "Control" }, "l", function() awful.util.spawn( "i3lock -c 000000 -d" ) end)
+    awful.key({modkey, "Control" }, "l", function() awful.util.spawn( "i3lock -c 808080" ) end)
 )
 
 clientkeys = awful.util.table.join(
