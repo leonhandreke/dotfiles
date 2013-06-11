@@ -25,6 +25,8 @@ Bundle 'lukerandall/haskellmode-vim'
 Bundle 'digitaltoad/vim-jade'
 Bundle 'vim-scripts/JavaScript-Indent'
 Bundle 'vim-scripts/iptables'
+Bundle 'uarun/vim-protobuf'
+Bundle 'MarcWeber/vim-addon-local-vimrc'
 
 " Autocompletion
 " Bundle 'Valloric/YouCompleteMe'
