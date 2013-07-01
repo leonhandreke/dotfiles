@@ -27,6 +27,7 @@ Bundle 'vim-scripts/JavaScript-Indent'
 Bundle 'vim-scripts/iptables'
 Bundle 'uarun/vim-protobuf'
 Bundle 'MarcWeber/vim-addon-local-vimrc'
+Bundle 'davidhalter/jedi-vim'
 
 " Autocompletion
 " Bundle 'Valloric/YouCompleteMe'
