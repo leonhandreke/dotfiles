@@ -13,10 +13,7 @@ Bundle 'nathanaelkane/vim-indent-guides'
 Bundle 'Lokaltog/vim-powerline'
 Bundle 'MarcWeber/vim-addon-local-vimrc'
 Bundle 'altercation/vim-colors-solarized'
-
-" Autocompletion
-" Bundle 'Valloric/YouCompleteMe'
-" Syntax check
+"Bundle 'Valloric/YouCompleteMe'
 Bundle 'scrooloose/syntastic'
 
 " Syntax support
