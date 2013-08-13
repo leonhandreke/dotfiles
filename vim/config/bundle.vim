@@ -15,6 +15,7 @@ Bundle 'MarcWeber/vim-addon-local-vimrc'
 Bundle 'altercation/vim-colors-solarized'
 "Bundle 'Valloric/YouCompleteMe'
 Bundle 'scrooloose/syntastic'
+Bundle 'kien/ctrlp.vim'
 
 " Syntax support
 Bundle 'Glench/Vim-Jinja2-Syntax'
