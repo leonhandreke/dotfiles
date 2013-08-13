@@ -5,7 +5,6 @@ call vundle#rc()
 " Let Vundle take care of itself
 Bundle 'gmarik/vundle'
 
-"Bundle 'hallison/vim-markdown'
 Bundle 'tpope/vim-git'
 Bundle 'tpope/vim-fugitive'
 Bundle 'sjl/gundo.vim'
@@ -13,6 +12,7 @@ Bundle 'majutsushi/tagbar'
 Bundle 'nathanaelkane/vim-indent-guides'
 Bundle 'Lokaltog/vim-powerline'
 Bundle 'MarcWeber/vim-addon-local-vimrc'
+Bundle 'altercation/vim-colors-solarized'
 
 " Autocompletion
 " Bundle 'Valloric/YouCompleteMe'
