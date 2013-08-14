@@ -11,5 +11,8 @@ set nobackup
 " Use bash like autocompletion behaviour to enable more bashing of the tab key
 set wildmode=list:longest
 
+" Disable Ex mode
+nnoremap Q <nop>
+
 " Enable syntax highlighting
 syntax on
