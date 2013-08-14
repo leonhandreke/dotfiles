@@ -21,3 +21,4 @@ alias open="xdg-open"
 
 # npm library path
 export NODE_PATH="/usr/local/lib/node"
+export EDITOR=vim
