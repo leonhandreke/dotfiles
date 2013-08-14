@@ -7,10 +7,8 @@ set textwidth=120
 set shiftwidth=4
 set tabstop=4
 
-" Remember the position when reopening a file
-if has("autocmd")
-	au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
-endif
+" Remember the position when reopening a file with restore_view.vim
+set viewoptions=cursor,folds,slash,unix
 
 " Do not create annoying temporary and backup files
 set noswapfile
