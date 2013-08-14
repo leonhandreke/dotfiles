@@ -8,6 +8,9 @@ These are my dotfiles. They use the python [`dotfiles`](https://github.com/jbern
 	git clone git://github.com/leonhandreke/dotfiles.git ~/.dotfiles
 	dotfiles -C ~/.dotfiles/dotfilesrc --sync
 
+## Update submodules
+	git submodule init
+	git submodule update
 
 ## Install vim bundles
 	cd ~/.vim/bundle
