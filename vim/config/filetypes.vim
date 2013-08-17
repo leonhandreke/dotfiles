@@ -1,5 +1,6 @@
 " Tab and indenting rules
 autocmd FileType python		set textwidth=0 expandtab tabstop=4 shiftwidth=4
+autocmd FileType rst		set textwidth=0 expandtab tabstop=4 shiftwidth=4
 autocmd FileType python		let &colorcolumn=join(range(81,999),",")
 autocmd FileType javascript 	set expandtab tabstop=4 shiftwidth=4
 autocmd FileType coffee 	set expandtab tabstop=2 shiftwidth=2
