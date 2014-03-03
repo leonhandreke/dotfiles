@@ -14,3 +14,10 @@
 
 [github]
 	user = leonhandreke
+[push]
+	default = simple
+[url "git://anongit.kde.org/"]
+	insteadOf = kde:
+[url "git@git.kde.org:"]
+	pushInsteadOf = kde:
+
