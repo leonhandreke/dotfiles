@@ -1,1 +1,1 @@
-export MPD_HOST="music.ndreke.de"
+export MPD_HOST="eindhoven.ndreke.de"

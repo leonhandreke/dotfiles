@@ -7,7 +7,7 @@
 #
 ## set it in order to make tag editor and renaming files work properly
 #
-mpd_host = "music.ndreke.de"
+mpd_host = "eindhoven.ndreke.de"
 #
 #mpd_port = "6600"
 #
