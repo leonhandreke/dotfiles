@@ -406,6 +406,7 @@ check_com() {
 salias() {
     emulate -L zsh
     local only=0 ; local multi=0
+    local key val
     while [[ $1 == -* ]] ; do
         case $1 in
             (-o) only=1 ;;
@@ -495,8 +496,7 @@ xcat() {
 xunfunction() {
     emulate -L zsh
     local -a funcs
-    funcs=(salias xcat xsource xunfunction zrcautoload)
-
+    funcs=(salias xcat xsource xunfunction zrcautoload zrcautozle)
     for func in $funcs ; do
         [[ -n ${functions[$func]} ]] \
             && unfunction $func
@@ -520,10 +520,6 @@ fi
 for var in LANG LC_ALL LC_MESSAGES ; do
     [[ -n ${(P)var} ]] && export $var
 done
-
-xsource "/etc/sysconfig/keyboard"
-
-TZ=$(xcat /etc/timezone)
 
 # set some variables
 if check_com -c vim ; then
@@ -591,52 +587,213 @@ watch=(notme root)
 # automatically remove duplicates from these arrays
 typeset -U path cdpath fpath manpath
 
-# Remove zle-line-{init,finish} if it looks like it turns smkx. This would be
-# better fixed by working with those modes too, but we use way too many
-# hardcoded bindings for now.
-function remove_widget () {
-    local name=$1
-    local cap=$2
-    if (( ${+functions[$name]} )) && [[ ${functions[$name]} == *${cap}* ]]; then
-        local w=${widgets[$name]}
-        zle -D $name
-        [[ $w == user:* ]] && unfunction ${w#*:}
-    fi
-}
-remove_widget zle-line-init smkx
-remove_widget zle-line-finish rmkx
-unfunction remove_widget
+# Load a few modules
+is4 && \
+for mod in parameter complist deltochar mathfunc ; do
+    zmodload -i zsh/${mod} 2>/dev/null || print "Notice: no ${mod} available :("
+done
 
-# keybindings
-if [[ "$TERM" != emacs ]] ; then
-    [[ -z "$terminfo[kdch1]" ]] || bindkey -M emacs "$terminfo[kdch1]" delete-char
-    [[ -z "$terminfo[khome]" ]] || bindkey -M emacs "$terminfo[khome]" beginning-of-line
-    [[ -z "$terminfo[kend]"  ]] || bindkey -M emacs "$terminfo[kend]"  end-of-line
-    [[ -z "$terminfo[kdch1]" ]] || bindkey -M vicmd "$terminfo[kdch1]" vi-delete-char
-    [[ -z "$terminfo[khome]" ]] || bindkey -M vicmd "$terminfo[khome]" vi-beginning-of-line
-    [[ -z "$terminfo[kend]"  ]] || bindkey -M vicmd "$terminfo[kend]"  vi-end-of-line
-    [[ -z "$terminfo[cuu1]"  ]] || bindkey -M viins "$terminfo[cuu1]"  vi-up-line-or-history
-    [[ -z "$terminfo[cuf1]"  ]] || bindkey -M viins "$terminfo[cuf1]"  vi-forward-char
-    [[ -z "$terminfo[kcuu1]" ]] || bindkey -M viins "$terminfo[kcuu1]" vi-up-line-or-history
-    [[ -z "$terminfo[kcud1]" ]] || bindkey -M viins "$terminfo[kcud1]" vi-down-line-or-history
-    [[ -z "$terminfo[kcuf1]" ]] || bindkey -M viins "$terminfo[kcuf1]" vi-forward-char
-    [[ -z "$terminfo[kcub1]" ]] || bindkey -M viins "$terminfo[kcub1]" vi-backward-char
-    # ncurses stuff:
-    [[ "$terminfo[kcuu1]" == $'\eO'* ]] && bindkey -M viins "${terminfo[kcuu1]/O/[}" vi-up-line-or-history
-    [[ "$terminfo[kcud1]" == $'\eO'* ]] && bindkey -M viins "${terminfo[kcud1]/O/[}" vi-down-line-or-history
-    [[ "$terminfo[kcuf1]" == $'\eO'* ]] && bindkey -M viins "${terminfo[kcuf1]/O/[}" vi-forward-char
-    [[ "$terminfo[kcub1]" == $'\eO'* ]] && bindkey -M viins "${terminfo[kcub1]/O/[}" vi-backward-char
-    [[ "$terminfo[khome]" == $'\eO'* ]] && bindkey -M viins "${terminfo[khome]/O/[}" beginning-of-line
-    [[ "$terminfo[kend]"  == $'\eO'* ]] && bindkey -M viins "${terminfo[kend]/O/[}"  end-of-line
-    [[ "$terminfo[khome]" == $'\eO'* ]] && bindkey -M emacs "${terminfo[khome]/O/[}" beginning-of-line
-    [[ "$terminfo[kend]"  == $'\eO'* ]] && bindkey -M emacs "${terminfo[kend]/O/[}"  end-of-line
+# autoload zsh modules when they are referenced
+if is4 ; then
+    zmodload -a  zsh/stat    zstat
+    zmodload -a  zsh/zpty    zpty
+    zmodload -ap zsh/mapfile mapfile
 fi
 
-## keybindings (run 'bindkeys' for details, more details via man zshzle)
-# use emacs style per default:
+# completion system
+if zrcautoload compinit ; then
+    compinit || print 'Notice: no compinit available :('
+else
+    print 'Notice: no compinit available :('
+    function compdef { }
+fi
+
+# completion system
+
+# called later (via is4 && grmlcomp)
+# note: use 'zstyle' for getting current settings
+#         press ^xh (control-x h) for getting tags in context; ^x? (control-x ?) to run complete_debug with trace output
+grmlcomp() {
+    # TODO: This could use some additional information
+
+    # Make sure the completion system is initialised
+    (( ${+_comps} )) || return 1
+
+    # allow one error for every three characters typed in approximate completer
+    zstyle ':completion:*:approximate:'    max-errors 'reply=( $((($#PREFIX+$#SUFFIX)/3 )) numeric )'
+
+    # don't complete backup files as executables
+    zstyle ':completion:*:complete:-command-::commands' ignored-patterns '(aptitude-*|*\~)'
+
+    # start menu completion only if it could find no unambiguous initial string
+    zstyle ':completion:*:correct:*'       insert-unambiguous true
+    zstyle ':completion:*:corrections'     format $'%{\e[0;31m%}%d (errors: %e)%{\e[0m%}'
+    zstyle ':completion:*:correct:*'       original true
+
+    # activate color-completion
+    zstyle ':completion:*:default'         list-colors ${(s.:.)LS_COLORS}
+
+    # format on completion
+    zstyle ':completion:*:descriptions'    format $'%{\e[0;31m%}completing %B%d%b%{\e[0m%}'
+
+    # automatically complete 'cd -<tab>' and 'cd -<ctrl-d>' with menu
+    # zstyle ':completion:*:*:cd:*:directory-stack' menu yes select
+
+    # insert all expansions for expand completer
+    zstyle ':completion:*:expand:*'        tag-order all-expansions
+    zstyle ':completion:*:history-words'   list false
+
+    # activate menu
+    zstyle ':completion:*:history-words'   menu yes
+
+    # ignore duplicate entries
+    zstyle ':completion:*:history-words'   remove-all-dups yes
+    zstyle ':completion:*:history-words'   stop yes
+
+    # match uppercase from lowercase
+    zstyle ':completion:*'                 matcher-list 'm:{a-z}={A-Z}'
+
+    # separate matches into groups
+    zstyle ':completion:*:matches'         group 'yes'
+    zstyle ':completion:*'                 group-name ''
+
+    if [[ "$NOMENU" -eq 0 ]] ; then
+        # if there are more than 5 options allow selecting from a menu
+        zstyle ':completion:*'               menu select=5
+    else
+        # don't use any menus at all
+        setopt no_auto_menu
+    fi
+
+    zstyle ':completion:*:messages'        format '%d'
+    zstyle ':completion:*:options'         auto-description '%d'
+
+    # describe options in full
+    zstyle ':completion:*:options'         description 'yes'
+
+    # on processes completion complete all user processes
+    zstyle ':completion:*:processes'       command 'ps -au$USER'
+
+    # offer indexes before parameters in subscripts
+    zstyle ':completion:*:*:-subscript-:*' tag-order indexes parameters
+
+    # provide verbose completion information
+    zstyle ':completion:*'                 verbose true
+
+    # recent (as of Dec 2007) zsh versions are able to provide descriptions
+    # for commands (read: 1st word in the line) that it will list for the user
+    # to choose from. The following disables that, because it's not exactly fast.
+    zstyle ':completion:*:-command-:*:'    verbose false
+
+    # set format for warnings
+    zstyle ':completion:*:warnings'        format $'%{\e[0;31m%}No matches for:%{\e[0m%} %d'
+
+    # define files to ignore for zcompile
+    zstyle ':completion:*:*:zcompile:*'    ignored-patterns '(*~|*.zwc)'
+    zstyle ':completion:correct:'          prompt 'correct to: %e'
+
+    # Ignore completion functions for commands you don't have:
+    zstyle ':completion::(^approximate*):*:functions' ignored-patterns '_*'
+
+    # Provide more processes in completion of programs like killall:
+    zstyle ':completion:*:processes-names' command 'ps c -u ${USER} -o command | uniq'
+
+    # complete manual by their section
+    zstyle ':completion:*:manuals'    separate-sections true
+    zstyle ':completion:*:manuals.*'  insert-sections   true
+    zstyle ':completion:*:man:*'      menu yes select
+
+    # Search path for sudo completion
+    zstyle ':completion:*:sudo:*' command-path /usr/local/sbin \
+                                               /usr/local/bin  \
+                                               /usr/sbin       \
+                                               /usr/bin        \
+                                               /sbin           \
+                                               /bin            \
+                                               /usr/X11R6/bin
+
+    # provide .. as a completion
+    zstyle ':completion:*' special-dirs ..
+
+    # run rehash on completion so new installed program are found automatically:
+    _force_rehash() {
+        (( CURRENT == 1 )) && rehash
+        return 1
+    }
+
+    ## correction
+    # some people don't like the automatic correction - so run 'NOCOR=1 zsh' to deactivate it
+    if [[ "$NOCOR" -gt 0 ]] ; then
+        zstyle ':completion:*' completer _oldlist _expand _force_rehash _complete _files _ignored
+        setopt nocorrect
+    else
+        # try to be smart about when to use what completer...
+        setopt correct
+        zstyle -e ':completion:*' completer '
+            if [[ $_last_try != "$HISTNO$BUFFER$CURSOR" ]] ; then
+                _last_try="$HISTNO$BUFFER$CURSOR"
+                reply=(_complete _match _ignored _prefix _files)
+            else
+                if [[ $words[1] == (rm|mv) ]] ; then
+                    reply=(_complete _files)
+                else
+                    reply=(_oldlist _expand _force_rehash _complete _ignored _correct _approximate _files)
+                fi
+            fi'
+    fi
+
+    # command for process lists, the local web server details and host completion
+    zstyle ':completion:*:urls' local 'www' '/var/www/' 'public_html'
+
+    # caching
+    [[ -d $ZSHDIR/cache ]] && zstyle ':completion:*' use-cache yes && \
+                            zstyle ':completion::complete:*' cache-path $ZSHDIR/cache/
+
+    # host completion
+    if is42 ; then
+        [[ -r ~/.ssh/known_hosts ]] && _ssh_hosts=(${${${${(f)"$(<$HOME/.ssh/known_hosts)"}:#[\|]*}%%\ *}%%,*}) || _ssh_hosts=()
+        [[ -r /etc/hosts ]] && : ${(A)_etc_hosts:=${(s: :)${(ps:\t:)${${(f)~~"$(</etc/hosts)"}%%\#*}##[:blank:]#[^[:blank:]]#}}} || _etc_hosts=()
+    else
+        _ssh_hosts=()
+        _etc_hosts=()
+    fi
+    hosts=(
+        $(hostname)
+        "$_ssh_hosts[@]"
+        "$_etc_hosts[@]"
+        localhost
+    )
+    zstyle ':completion:*:hosts' hosts $hosts
+    # TODO: so, why is this here?
+    #  zstyle '*' hosts $hosts
+
+    # use generic completion system for programs not yet defined; (_gnu_generic works
+    # with commands that provide a --help option with "standard" gnu-like output.)
+    for compcom in cp deborphan df feh fetchipac head hnb ipacsum mv \
+                   pal stow tail uname ; do
+        [[ -z ${_comps[$compcom]} ]] && compdef _gnu_generic ${compcom}
+    done; unset compcom
+
+    # see upgrade function in this file
+    compdef _hosts upgrade
+}
+
+# Keyboard setup: The following is based on the same code, we wrote for
+# debian's setup. It ensures the terminal is in the right mode, when zle is
+# active, so the values from $terminfo are valid. Therefore, this setup should
+# work on all systems, that have support for `terminfo'. It also requires the
+# zsh in use to have the `zsh/terminfo' module built.
+#
+# If you are customising your `zle-line-init()' or `zle-line-finish()'
+# functions, make sure you call the following utility functions in there:
+#
+#     - zle-line-init():      zle-smkx
+#     - zle-line-finish():    zle-rmkx
+
+# Use emacs-like key bindings by default:
 bindkey -e
-# use vi style:
-# bindkey -v
+
+# Custom widgets:
 
 ## beginning-of-line OR beginning-of-buffer OR beginning of history
 ## by: Bart Schaefer <schaefer@brasslantern.com>, Bernhard Tittelbach
@@ -655,69 +812,6 @@ beginning-or-end-of-somewhere() {
 zle -N beginning-of-somewhere beginning-or-end-of-somewhere
 zle -N end-of-somewhere beginning-or-end-of-somewhere
 
-
-#if [[ "$TERM" == screen ]] ; then
-
-## with HOME/END, move to beginning/end of line (on multiline) on first keypress
-## to beginning/end of buffer on second keypress
-## and to beginning/end of history on (at most) the third keypress
-# terminator & non-debian xterm
-bindkey '\eOH' beginning-of-somewhere  # home
-bindkey '\eOF' end-of-somewhere        # end
-# freebsd console
-bindkey '\e[H' beginning-of-somewhere   # home
-bindkey '\e[F' end-of-somewhere         # end
-# xterm,gnome-terminal,quake,etc
-bindkey '^[[1~' beginning-of-somewhere  # home
-bindkey '^[[4~' end-of-somewhere        # end
-# if terminal type is set to 'rxvt':
-bindkey '\e[7~' beginning-of-somewhere  # home
-bindkey '\e[8~' end-of-somewhere        # end
-#fi
-
-bindkey '\e[A'  up-line-or-search       # cursor up
-bindkey '\e[B'  down-line-or-search     # <ESC>-
-
-## use Ctrl-left-arrow and Ctrl-right-arrow for jumping to word-beginnings on the CL
-bindkey "\e[5C" forward-word
-bindkey "\e[5D" backward-word
-bindkey "\e[1;5C" forward-word
-bindkey "\e[1;5D" backward-word
-## the same for alt-left-arrow and alt-right-arrow
-bindkey '^[[1;3C' forward-word
-bindkey '^[[1;3D' backward-word
-
-# Search backward in the history for a line beginning with the current
-# line up to the cursor and move the cursor to the end of the line then
-zle -N history-beginning-search-backward-end history-search-end
-zle -N history-beginning-search-forward-end  history-search-end
-#k# search history backward for entry beginning with typed text
-bindkey '^xp'   history-beginning-search-backward-end
-#k# search history forward for entry beginning with typed text
-bindkey '^xP'   history-beginning-search-forward-end
-#k# search history backward for entry beginning with typed text
-bindkey "\e[5~" history-beginning-search-backward-end # PageUp
-#k# search history forward for entry beginning with typed text
-bindkey "\e[6~" history-beginning-search-forward-end  # PageDown
-
-# bindkey -s '^l' "|less\n"             # ctrl-L pipes to less
-# bindkey -s '^b' " &\n"                # ctrl-B runs it in the background
-
-# insert unicode character
-# usage example: 'ctrl-x i' 00A7 'ctrl-x i' will give you an §
-# See for example http://unicode.org/charts/ for unicode characters code
-zrcautoload insert-unicode-char
-zle -N insert-unicode-char
-#k# Insert Unicode character
-bindkey '^xi' insert-unicode-char
-
-#m# k Shift-tab Perform backwards menu completion
-if [[ -n "$terminfo[kcbt]" ]]; then
-    bindkey "$terminfo[kcbt]" reverse-menu-complete
-elif [[ -n "$terminfo[cbt]" ]]; then # required for GNU screen
-    bindkey "$terminfo[cbt]"  reverse-menu-complete
-fi
-
 ## toggle the ,. abbreviation feature on/off
 # NOABBREVIATION: default abbreviation-state
 #                 0 - enabled (default)
@@ -731,9 +825,6 @@ grml_toggle_abbrev() {
         NOABBREVIATION=1
     fi
 }
-
-#k# Toggle abbreviation expansion on/off
-bindkey '^xA' grml_toggle_abbrev
 zle -N grml_toggle_abbrev
 
 # add a command line to the shells history without executing it
@@ -742,7 +833,6 @@ commit-to-history() {
     zle send-break
 }
 zle -N commit-to-history
-bindkey "^x^h" commit-to-history
 
 # only slash should be considered as a word separator:
 slash-backward-kill-word() {
@@ -751,19 +841,6 @@ slash-backward-kill-word() {
     zle backward-kill-word
 }
 zle -N slash-backward-kill-word
-
-#k# Kill left-side word or everything up to next slash
-bindkey '\ev' slash-backward-kill-word
-#k# Kill left-side word or everything up to next slash
-bindkey '\e^h' slash-backward-kill-word
-#k# Kill left-side word or everything up to next slash
-bindkey '\e^?' slash-backward-kill-word
-
-# use the new *-pattern-* widgets for incremental history search
-if is439 ; then
-    bindkey '^r' history-incremental-pattern-search-backward
-    bindkey '^s' history-incremental-pattern-search-forward
-fi
 
 # a generic accept-line wrapper
 
@@ -911,11 +988,10 @@ zle -N accept-line
 zle -N Accept-Line
 zle -N Accept-Line-HandleContext
 
-# power completion - abbreviation expansion
 # power completion / abbreviation expansion / buffer expansion
 # see http://zshwiki.org/home/examples/zleiab for details
 # less risky than the global aliases but powerful as well
-# just type the abbreviation key and afterwards ',.' to expand it
+# just type the abbreviation key and afterwards 'ctrl-x .' to expand it
 declare -A abk
 setopt extendedglob
 setopt interactivecomments
@@ -956,109 +1032,22 @@ zleiab() {
     LBUFFER+=${abk[$MATCH]:-$MATCH}
 }
 
-zle -N zleiab && bindkey ",." zleiab
+zle -N zleiab
 
-#f# display contents of assoc array $abk
 help-show-abk()
 {
   zle -M "$(print "Type ,. after these abbreviations to expand them:"; print -a -C 2 ${(kv)abk})"
 }
-#k# Display list of abbreviations that expand when followed by ,.
-zle -N help-show-abk && bindkey '^xb' help-show-abk
 
-# autoloading
-zrcautoload zmv    # who needs mmv or rename?
-zrcautoload history-search-end
-
-# we don't want to quote/espace URLs on our own...
-# if autoload -U url-quote-magic ; then
-#    zle -N self-insert url-quote-magic
-#    zstyle ':url-quote-magic:*' url-metas '*?[]^()~#{}='
-# else
-#    print 'Notice: no url-quote-magic available :('
-# fi
-alias url-quote='autoload -U url-quote-magic ; zle -N self-insert url-quote-magic'
-
-#m# k ESC-h Call \kbd{run-help} for the 1st word on the command line
-alias run-help >&/dev/null && unalias run-help
-for rh in run-help{,-git,-svk,-svn}; do
-    zrcautoload $rh
-done; unset rh
-
-# command not found handling
-
-(( ${COMMAND_NOT_FOUND} == 1 )) &&
-function command_not_found_handler() {
-    emulate -L zsh
-    if [[ -x ${GRML_ZSH_CNF_HANDLER} ]] ; then
-        ${GRML_ZSH_CNF_HANDLER} $1
-    fi
-    return 1
-}
-
-# completion system
-if zrcautoload compinit ; then
-    compinit || print 'Notice: no compinit available :('
-else
-    print 'Notice: no compinit available :('
-    function compdef { }
-fi
-
-is4 && zrcautoload zed # use ZLE editor to edit a file or function
-
-is4 && \
-for mod in complist deltochar mathfunc ; do
-    zmodload -i zsh/${mod} 2>/dev/null || print "Notice: no ${mod} available :("
-done
-
-# autoload zsh modules when they are referenced
-if is4 ; then
-    zmodload -a  zsh/stat    zstat
-    zmodload -a  zsh/zpty    zpty
-    zmodload -ap zsh/mapfile mapfile
-fi
-
-if is4 && zrcautoload insert-files && zle -N insert-files ; then
-    #k# Insert files and test globbing
-    bindkey "^xf" insert-files # C-x-f
-fi
-
-bindkey ' '   magic-space    # also do history expansion on space
-#k# Trigger menu-complete
-bindkey '\ei' menu-complete  # menu completion via esc-i
-
-# press esc-e for editing command line in $EDITOR or $VISUAL
-if is4 && zrcautoload edit-command-line && zle -N edit-command-line ; then
-    #k# Edit the current line in \kbd{\$EDITOR}
-    bindkey '\ee' edit-command-line
-fi
-
-if is4 && [[ -n ${(k)modules[zsh/complist]} ]] ; then
-    #k# menu selection: pick item but stay in the menu
-    bindkey -M menuselect '\e^M' accept-and-menu-complete
-    # also use + and INSERT since it's easier to press repeatedly
-    bindkey -M menuselect "+" accept-and-menu-complete
-    bindkey -M menuselect "^[[2~" accept-and-menu-complete
-
-    # accept a completion and try to complete again by using menu
-    # completion; very useful with completing directories
-    # by using 'undo' one's got a simple file browser
-    bindkey -M menuselect '^o' accept-and-infer-next-history
-fi
+zle -N help-show-abk
 
 # press "ctrl-e d" to insert the actual date in the form yyyy-mm-dd
 insert-datestamp() { LBUFFER+=${(%):-'%D{%Y-%m-%d}'}; }
 zle -N insert-datestamp
 
-#k# Insert a timestamp on the command line (yyyy-mm-dd)
-bindkey '^ed' insert-datestamp
-
 # press esc-m for inserting last typed word again (thanks to caphuso!)
 insert-last-typed-word() { zle insert-last-word -- 0 -1 };
 zle -N insert-last-typed-word;
-
-#k# Insert last typed word
-bindkey "\em" insert-last-typed-word
 
 function grml-zsh-fg() {
   if (( ${#jobstates} )); then
@@ -1071,8 +1060,6 @@ function grml-zsh-fg() {
   fi
 }
 zle -N grml-zsh-fg
-#k# A smart shortcut for \kbd{fg<enter>}
-bindkey '^z' grml-zsh-fg
 
 # run command line as user root via sudo:
 sudo-command-line() {
@@ -1083,9 +1070,6 @@ sudo-command-line() {
     fi
 }
 zle -N sudo-command-line
-
-#k# prepend the current command with "sudo"
-bindkey "^os" sudo-command-line
 
 ### jump behind the first word on the cmdline.
 ### useful to add options.
@@ -1100,14 +1084,163 @@ function jump_after_first_word() {
     fi
 }
 zle -N jump_after_first_word
-#k# jump to after first word (for adding options)
-bindkey '^x1' jump_after_first_word
 
-# complete word from history with menu (from Book: ZSH, OpenSource-Press)
-zle -C hist-complete complete-word _generic
-zstyle ':completion:hist-complete:*' completer _history
-#k# complete word from history with menu
-bindkey "^x^x" hist-complete
+#f5# Create directory under cursor or the selected area
+inplaceMkDirs() {
+    # Press ctrl-xM to create the directory under the cursor or the selected area.
+    # To select an area press ctrl-@ or ctrl-space and use the cursor.
+    # Use case: you type "mv abc ~/testa/testb/testc/" and remember that the
+    # directory does not exist yet -> press ctrl-XM and problem solved
+    local PATHTOMKDIR
+    if ((REGION_ACTIVE==1)); then
+        local F=$MARK T=$CURSOR
+        if [[ $F -gt $T ]]; then
+            F=${CURSOR}
+            T=${MARK}
+        fi
+        # get marked area from buffer and eliminate whitespace
+        PATHTOMKDIR=${BUFFER[F+1,T]%%[[:space:]]##}
+        PATHTOMKDIR=${PATHTOMKDIR##[[:space:]]##}
+    else
+        local bufwords iword
+        bufwords=(${(z)LBUFFER})
+        iword=${#bufwords}
+        bufwords=(${(z)BUFFER})
+        PATHTOMKDIR="${(Q)bufwords[iword]}"
+    fi
+    [[ -z "${PATHTOMKDIR}" ]] && return 1
+    PATHTOMKDIR=${~PATHTOMKDIR}
+    if [[ -e "${PATHTOMKDIR}" ]]; then
+        zle -M " path already exists, doing nothing"
+    else
+        zle -M "$(mkdir -p -v "${PATHTOMKDIR}")"
+        zle end-of-line
+    fi
+}
+
+#k# mkdir -p <dir> from string under cursor or marked area
+zle -N inplaceMkDirs
+
+#v1# set number of lines to display per page
+HELP_LINES_PER_PAGE=20
+#v1# set location of help-zle cache file
+HELP_ZLE_CACHE_FILE=~/.cache/zsh_help_zle_lines.zsh
+# helper function for help-zle, actually generates the help text
+help_zle_parse_keybindings()
+{
+    emulate -L zsh
+    setopt extendedglob
+    unsetopt ksharrays  #indexing starts at 1
+
+    #v1# choose files that help-zle will parse for keybindings
+    ((${+HELPZLE_KEYBINDING_FILES})) || HELPZLE_KEYBINDING_FILES=( /etc/zsh/zshrc ~/.zshrc.pre ~/.zshrc ~/.zshrc.local )
+
+    if [[ -r $HELP_ZLE_CACHE_FILE ]]; then
+        local load_cache=0
+        for f ($HELPZLE_KEYBINDING_FILES) [[ $f -nt $HELP_ZLE_CACHE_FILE ]] && load_cache=1
+        [[ $load_cache -eq 0 ]] && . $HELP_ZLE_CACHE_FILE && return
+    fi
+
+    #fill with default keybindings, possibly to be overwriten in a file later
+    #Note that due to zsh inconsistency on escaping assoc array keys, we encase the key in '' which we will remove later
+    local -A help_zle_keybindings
+    help_zle_keybindings['<Ctrl>@']="set MARK"
+    help_zle_keybindings['<Ctrl>x<Ctrl>j']="vi-join lines"
+    help_zle_keybindings['<Ctrl>x<Ctrl>b']="jump to matching brace"
+    help_zle_keybindings['<Ctrl>x<Ctrl>u']="undo"
+    help_zle_keybindings['<Ctrl>_']="undo"
+    help_zle_keybindings['<Ctrl>x<Ctrl>f<c>']="find <c> in cmdline"
+    help_zle_keybindings['<Ctrl>a']="goto beginning of line"
+    help_zle_keybindings['<Ctrl>e']="goto end of line"
+    help_zle_keybindings['<Ctrl>t']="transpose charaters"
+    help_zle_keybindings['<Alt>t']="transpose words"
+    help_zle_keybindings['<Alt>s']="spellcheck word"
+    help_zle_keybindings['<Ctrl>k']="backward kill buffer"
+    help_zle_keybindings['<Ctrl>u']="forward kill buffer"
+    help_zle_keybindings['<Ctrl>y']="insert previously killed word/string"
+    help_zle_keybindings["<Alt>'"]="quote line"
+    help_zle_keybindings['<Alt>"']="quote from mark to cursor"
+    help_zle_keybindings['<Alt><arg>']="repeat next cmd/char <arg> times (<Alt>-<Alt>1<Alt>0a -> -10 times 'a')"
+    help_zle_keybindings['<Alt>u']="make next word Uppercase"
+    help_zle_keybindings['<Alt>l']="make next word lowercase"
+    help_zle_keybindings['<Ctrl>xd']="preview expansion under cursor"
+    help_zle_keybindings['<Alt>q']="push current CL into background, freeing it. Restore on next CL"
+    help_zle_keybindings['<Alt>.']="insert (and interate through) last word from prev CLs"
+    help_zle_keybindings['<Alt>,']="complete word from newer history (consecutive hits)"
+    help_zle_keybindings['<Alt>m']="repeat last typed word on current CL"
+    help_zle_keybindings['<Ctrl>v']="insert next keypress symbol literally (e.g. for bindkey)"
+    help_zle_keybindings['!!:n*<Tab>']="insert last n arguments of last command"
+    help_zle_keybindings['!!:n-<Tab>']="insert arguments n..N-2 of last command (e.g. mv s s d)"
+    help_zle_keybindings['<Alt>h']="show help/manpage for current command"
+
+    #init global variables
+    unset help_zle_lines help_zle_sln
+    typeset -g -a help_zle_lines
+    typeset -g help_zle_sln=1
+
+    local k v
+    local lastkeybind_desc contents     #last description starting with #k# that we found
+    local num_lines_elapsed=0            #number of lines between last description and keybinding
+    #search config files in the order they a called (and thus the order in which they overwrite keybindings)
+    for f in $HELPZLE_KEYBINDING_FILES; do
+        [[ -r "$f" ]] || continue   #not readable ? skip it
+        contents="$(<$f)"
+        for cline in "${(f)contents}"; do
+            #zsh pattern: matches lines like: #k# ..............
+            if [[ "$cline" == (#s)[[:space:]]#\#k\#[[:space:]]##(#b)(*)[[:space:]]#(#e) ]]; then
+                lastkeybind_desc="$match[*]"
+                num_lines_elapsed=0
+            #zsh pattern: matches lines that set a keybinding using bind2map, bindkey or compdef -k
+            #             ignores lines that are commentend out
+            #             grabs first in '' or "" enclosed string with length between 1 and 6 characters
+            elif [[ "$cline" == [^#]#(bind2maps[[:space:]](*)-s|bindkey|compdef -k)[[:space:]](*)(#b)(\"((?)(#c1,6))\"|\'((?)(#c1,6))\')(#B)(*)  ]]; then
+                #description prevously found ? description not more than 2 lines away ? keybinding not empty ?
+                if [[ -n $lastkeybind_desc && $num_lines_elapsed -lt 2 && -n $match[1] ]]; then
+                    #substitute keybinding string with something readable
+                    k=${${${${${${${match[1]/\\e\^h/<Alt><BS>}/\\e\^\?/<Alt><BS>}/\\e\[5~/<PageUp>}/\\e\[6~/<PageDown>}//(\\e|\^\[)/<Alt>}//\^/<Ctrl>}/3~/<Alt><Del>}
+                    #put keybinding in assoc array, possibly overwriting defaults or stuff found in earlier files
+                    #Note that we are extracting the keybinding-string including the quotes (see Note at beginning)
+                    help_zle_keybindings[${k}]=$lastkeybind_desc
+                fi
+                lastkeybind_desc=""
+            else
+              ((num_lines_elapsed++))
+            fi
+        done
+    done
+    unset contents
+    #calculate length of keybinding column
+    local kstrlen=0
+    for k (${(k)help_zle_keybindings[@]}) ((kstrlen < ${#k})) && kstrlen=${#k}
+    #convert the assoc array into preformated lines, which we are able to sort
+    for k v in ${(kv)help_zle_keybindings[@]}; do
+        #pad keybinding-string to kstrlen chars and remove outermost characters (i.e. the quotes)
+        help_zle_lines+=("${(r:kstrlen:)k[2,-2]}${v}")
+    done
+    #sort lines alphabetically
+    help_zle_lines=("${(i)help_zle_lines[@]}")
+    [[ -d ${HELP_ZLE_CACHE_FILE:h} ]] || mkdir -p "${HELP_ZLE_CACHE_FILE:h}"
+    echo "help_zle_lines=(${(q)help_zle_lines[@]})" >| $HELP_ZLE_CACHE_FILE
+    zcompile $HELP_ZLE_CACHE_FILE
+}
+typeset -g help_zle_sln
+typeset -g -a help_zle_lines
+
+# Provides (partially autogenerated) help on keybindings and the zsh line editor
+help-zle()
+{
+    emulate -L zsh
+    unsetopt ksharrays  #indexing starts at 1
+    #help lines already generated ? no ? then do it
+    [[ ${+functions[help_zle_parse_keybindings]} -eq 1 ]] && {help_zle_parse_keybindings && unfunction help_zle_parse_keybindings}
+    #already displayed all lines ? go back to the start
+    [[ $help_zle_sln -gt ${#help_zle_lines} ]] && help_zle_sln=1
+    local sln=$help_zle_sln
+    #note that help_zle_sln is a global var, meaning we remember the last page we viewed
+    help_zle_sln=$((help_zle_sln + HELP_LINES_PER_PAGE))
+    zle -M "${(F)help_zle_lines[sln,help_zle_sln-1]}"
+}
+zle -N help-zle
 
 ## complete word from currently visible Screen or Tmux buffer.
 if check_com -c screen || check_com -c tmux; then
@@ -1140,6 +1273,268 @@ if check_com -c screen || check_com -c tmux; then
     compdef -k _complete_screen_display complete-word '^xS'
 fi
 
+# Load a few more functions and tie them to widgets, so they can be bound:
+
+function zrcautozle() {
+    emulate -L zsh
+    local fnc=$1
+    zrcautoload $fnc && zle -N $fnc
+}
+
+function zrcgotwidget() {
+    (( ${+widgets[$1]} ))
+}
+
+function zrcgotkeymap() {
+    [[ -n ${(M)keymaps:#$1} ]]
+}
+
+zrcautozle insert-files
+zrcautozle edit-command-line
+zrcautozle insert-unicode-char
+if zrcautoload history-search-end; then
+    zle -N history-beginning-search-backward-end history-search-end
+    zle -N history-beginning-search-forward-end  history-search-end
+fi
+zle -C hist-complete complete-word _generic
+zstyle ':completion:hist-complete:*' completer _history
+
+# The actual terminal setup hooks and bindkey-calls:
+
+# An array to note missing features to ease diagnosis in case of problems.
+typeset -ga grml_missing_features
+
+function zrcbindkey() {
+    if (( ARGC )) && zrcgotwidget ${argv[-1]}; then
+        bindkey "$@"
+    fi
+}
+
+function bind2maps () {
+    local i sequence widget
+    local -a maps
+
+    while [[ "$1" != "--" ]]; do
+        maps+=( "$1" )
+        shift
+    done
+    shift
+
+    if [[ "$1" == "-s" ]]; then
+        shift
+        sequence="$1"
+    else
+        sequence="${key[$1]}"
+    fi
+    widget="$2"
+
+    [[ -z "$sequence" ]] && return 1
+
+    for i in "${maps[@]}"; do
+        zrcbindkey -M "$i" "$sequence" "$widget"
+    done
+}
+
+if (( ${+terminfo[smkx]} )) && (( ${+terminfo[rmkx]} )); then
+    function zle-smkx () {
+        emulate -L zsh
+        printf '%s' ${terminfo[smkx]}
+    }
+    function zle-rmkx () {
+        emulate -L zsh
+        printf '%s' ${terminfo[rmkx]}
+    }
+    function zle-line-init () {
+        zle-smkx
+    }
+    function zle-line-finish () {
+        zle-rmkx
+    }
+    zle -N zle-line-init
+    zle -N zle-line-finish
+else
+    for i in {s,r}mkx; do
+        (( ${+terminfo[$i]} )) || grml_missing_features+=($i)
+    done
+    unset i
+fi
+
+typeset -A key
+key=(
+    Home     "${terminfo[khome]}"
+    End      "${terminfo[kend]}"
+    Insert   "${terminfo[kich1]}"
+    Delete   "${terminfo[kdch1]}"
+    Up       "${terminfo[kcuu1]}"
+    Down     "${terminfo[kcud1]}"
+    Left     "${terminfo[kcub1]}"
+    Right    "${terminfo[kcuf1]}"
+    PageUp   "${terminfo[kpp]}"
+    PageDown "${terminfo[knp]}"
+    BackTab  "${terminfo[kcbt]}"
+)
+
+# Guidelines for adding key bindings:
+#
+#   - Do not add hardcoded escape sequences, to enable non standard key
+#     combinations such as Ctrl-Meta-Left-Cursor. They are not easily portable.
+#
+#   - Adding Ctrl characters, such as '^b' is okay; note that '^b' and '^B' are
+#     the same key.
+#
+#   - All keys from the $key[] mapping are obviously okay.
+#
+#   - Most terminals send "ESC x" when Meta-x is pressed. Thus, sequences like
+#     '\ex' are allowed in here as well.
+
+bind2maps emacs             -- Home   beginning-of-somewhere
+bind2maps       viins vicmd -- Home   vi-beginning-of-line
+bind2maps emacs             -- End    end-of-somewhere
+bind2maps       viins vicmd -- End    vi-end-of-line
+bind2maps emacs viins       -- Insert overwrite-mode
+bind2maps             vicmd -- Insert vi-insert
+bind2maps emacs             -- Delete delete-char
+bind2maps       viins vicmd -- Delete vi-delete-char
+bind2maps emacs viins vicmd -- Up     up-line-or-search
+bind2maps emacs viins vicmd -- Down   down-line-or-search
+bind2maps emacs             -- Left   backward-char
+bind2maps       viins vicmd -- Left   vi-backward-char
+bind2maps emacs             -- Right  forward-char
+bind2maps       viins vicmd -- Right  vi-forward-char
+bind2maps       viins vicmd -- Right  vi-forward-char
+#k# Display list of abbreviations that expand when followed by ,.
+bind2maps emacs viins       -- -s '^x.' zleiab
+bind2maps emacs viins       -- -s '^xb' help-show-abk
+bind2maps emacs viins       -- -s '^xM' inplaceMkDirs
+#k# display help for keybindings and ZLE
+bind2maps emacs viins       -- -s '^xz' help-zle
+#k# Insert files and test globbing
+bind2maps emacs viins       -- -s "^xf" insert-files
+#k# Edit the current line in \kbd{\$EDITOR}
+bind2maps emacs viins       -- -s '\ee' edit-command-line
+#k# search history backward for entry beginning with typed text
+bind2maps emacs viins       -- -s '^xp' history-beginning-search-backward-end
+#k# search history forward for entry beginning with typed text
+bind2maps emacs viins       -- -s '^xP' history-beginning-search-forward-end
+#k# search history backward for entry beginning with typed text
+bind2maps emacs viins       -- PageUp history-beginning-search-backward-end
+#k# search history forward for entry beginning with typed text
+bind2maps emacs viins       -- PageDown history-beginning-search-forward-end
+#k# Toggle abbreviation expansion on/off
+bind2maps emacs viins       -- -s '^xA' grml_toggle_abbrev
+bind2maps emacs viins       -- -s "^x^h" commit-to-history
+#k# Kill left-side word or everything up to next slash
+bind2maps emacs viins       -- -s '\ev' slash-backward-kill-word
+#k# Kill left-side word or everything up to next slash
+bind2maps emacs viins       -- -s '\e^h' slash-backward-kill-word
+#k# Kill left-side word or everything up to next slash
+bind2maps emacs viins       -- -s '\e^?' slash-backward-kill-word
+# Do history expansion on space:
+bind2maps emacs viins       -- -s ' ' magic-space
+#k# Trigger menu-complete
+bind2maps emacs viins       -- -s '\ei' menu-complete  # menu completion via esc-i
+#k# Insert a timestamp on the command line (yyyy-mm-dd)
+bind2maps emacs viins       -- -s '^ed' insert-datestamp
+#k# Insert last typed word
+bind2maps emacs viins       -- -s "\em" insert-last-typed-word
+#k# A smart shortcut for \kbd{fg<enter>}
+bind2maps emacs viins       -- -s '^z' grml-zsh-fg
+#k# prepend the current command with "sudo"
+bind2maps emacs viins       -- -s "^os" sudo-command-line
+#k# jump to after first word (for adding options)
+bind2maps emacs viins       -- -s '^x1' jump_after_first_word
+#k# complete word from history with menu
+bind2maps emacs viins       -- -s "^x^x" hist-complete
+
+# insert unicode character
+# usage example: 'ctrl-x i' 00A7 'ctrl-x i' will give you an §
+# See for example http://unicode.org/charts/ for unicode characters code
+#k# Insert Unicode character
+bind2maps emacs viins       -- -s '^xi' insert-unicode-char
+
+# use the new *-pattern-* widgets for incremental history search
+if zrcgotwidget history-incremental-pattern-search-backward; then
+    for seq wid in '^r' history-incremental-pattern-search-backward \
+                   '^s' history-incremental-pattern-search-forward
+    do
+        bind2maps emacs viins vicmd -- -s $seq $wid
+    done
+fi
+
+if zrcgotkeymap menuselect; then
+    #m# k Shift-tab Perform backwards menu completion
+    bind2maps menuselect -- BackTab reverse-menu-complete
+
+    #k# menu selection: pick item but stay in the menu
+    bind2maps menuselect -- -s '\e^M' accept-and-menu-complete
+    # also use + and INSERT since it's easier to press repeatedly
+    bind2maps menuselect -- -s '+' accept-and-menu-complete
+    bind2maps menuselect -- Insert accept-and-menu-complete
+
+    # accept a completion and try to complete again by using menu
+    # completion; very useful with completing directories
+    # by using 'undo' one's got a simple file browser
+    bind2maps menuselect -- -s '^o' accept-and-infer-next-history
+fi
+
+# Finally, here are still a few hardcoded escape sequences; Special sequences
+# like Ctrl-<Cursor-key> etc do suck a fair bit, because they are not
+# standardised and most of the time are not available in a terminals terminfo
+# entry.
+#
+# While we do not encourage adding bindings like these, we will keep these for
+# backward compatibility.
+
+## use Ctrl-left-arrow and Ctrl-right-arrow for jumping to word-beginnings on
+## the command line.
+# URxvt sequences:
+bind2maps emacs viins vicmd -- -s '\eOc' forward-word
+bind2maps emacs viins vicmd -- -s '\eOd' backward-word
+# These are for xterm:
+bind2maps emacs viins vicmd -- -s '\e[1;5C' forward-word
+bind2maps emacs viins vicmd -- -s '\e[1;5D' backward-word
+## the same for alt-left-arrow and alt-right-arrow
+# URxvt again:
+bind2maps emacs viins vicmd -- -s '\e\e[C' forward-word
+bind2maps emacs viins vicmd -- -s '\e\e[D' backward-word
+# Xterm again:
+bind2maps emacs viins vicmd -- -s '^[[1;3C' forward-word
+bind2maps emacs viins vicmd -- -s '^[[1;3D' backward-word
+# Also try ESC Left/Right:
+bind2maps emacs viins vicmd -- -s '\e'${key[Right]} forward-word
+bind2maps emacs viins vicmd -- -s '\e'${key[Left]}  backward-word
+
+# autoloading
+
+zrcautoload zmv
+zrcautoload zed
+
+# we don't want to quote/espace URLs on our own...
+# if autoload -U url-quote-magic ; then
+#    zle -N self-insert url-quote-magic
+#    zstyle ':url-quote-magic:*' url-metas '*?[]^()~#{}='
+# else
+#    print 'Notice: no url-quote-magic available :('
+# fi
+alias url-quote='autoload -U url-quote-magic ; zle -N self-insert url-quote-magic'
+
+#m# k ESC-h Call \kbd{run-help} for the 1st word on the command line
+alias run-help >&/dev/null && unalias run-help
+for rh in run-help{,-git,-svk,-svn}; do
+    zrcautoload $rh
+done; unset rh
+
+# command not found handling
+
+(( ${COMMAND_NOT_FOUND} == 1 )) &&
+function command_not_found_handler() {
+    emulate -L zsh
+    if [[ -x ${GRML_ZSH_CNF_HANDLER} ]] ; then
+        ${GRML_ZSH_CNF_HANDLER} $1
+    fi
+    return 1
+}
+
 # history
 
 ZSHDIR=${ZDOTDIR:-${HOME}/.zsh}
@@ -1161,6 +1556,7 @@ if [[ -f ${DIRSTACKFILE} ]] && [[ ${#dirstack[*]} -eq 0 ]] ; then
 fi
 
 chpwd() {
+    if (( $DIRSTACKSIZE <= 0 )) || [[ -z $DIRSTACKFILE ]]; then return; fi
     local -ax my_stack
     my_stack=( ${PWD} ${dirstack} )
     if is42 ; then
@@ -1440,7 +1836,8 @@ function prompt_grml-large_setup () {
 # matter by using zsh's `zstyle' mechanism.
 typeset -gA grml_prompt_pre_default \
             grml_prompt_post_default \
-            grml_prompt_token_default
+            grml_prompt_token_default \
+            grml_prompt_token_function
 
 grml_prompt_pre_default=(
     at                ''
@@ -1454,7 +1851,7 @@ grml_prompt_pre_default=(
     newline           ''
     path              '%B'
     percent           ''
-    rc                '%F{red}'
+    rc                '%B%F{red}'
     rc-always         ''
     sad-smiley        ''
     shell-level       '%F{red}'
@@ -1475,7 +1872,7 @@ grml_prompt_post_default=(
     newline           ''
     path              '%b'
     percent           ''
-    rc                '%f'
+    rc                '%f%b'
     rc-always         ''
     sad-smiley        ''
     shell-level       '%f'
@@ -1495,7 +1892,7 @@ grml_prompt_token_default=(
     jobs              '[%j running job(s)] '
     newline           $'\n'
     path              '%40<..<%~%<< '
-    percent           '% # '
+    percent           '%# '
     rc                '%(?..%? )'
     rc-always         '%?'
     sad-smiley        '%(?..:()'
@@ -1504,6 +1901,123 @@ grml_prompt_token_default=(
     user              '%n'
     vcs               '0'
 )
+
+function grml_theme_has_token () {
+    if (( ARGC != 1 )); then
+        printf 'usage: grml_theme_has_token <name>\n'
+        return 1
+    fi
+    (( ${+grml_prompt_token_default[$1]} ))
+}
+
+function GRML_theme_add_token_usage () {
+    cat <<__EOF__
+  Usage: grml_theme_add_token <name> [-f|-i] <token/function> [<pre> <post>]
+
+    <name> is the name for the newly added token. If the \`-f' or \`-i' options
+    are used, <token/function> is the name of the function (see below for
+    details). Otherwise it is the literal token string to be used. <pre> and
+    <post> are optional.
+
+  Options:
+
+    -f <function>   Use a function named \`<function>' each time the token
+                    is to be expanded.
+
+    -i <function>   Use a function named \`<function>' to initialise the
+                    value of the token _once_ at runtime.
+
+    The functions are called with one argument: the token's new name. The
+    return value is expected in the \$REPLY parameter. The use of these
+    options is mutually exclusive.
+
+    There is a utility function \`grml_theme_has_token', which you can use
+    to test if a token exists before trying to add it. This can be a guard
+    for situations in which a \`grml_theme_add_token' call may happen more
+    than once.
+
+  Example:
+
+    To add a new token \`day' that expands to the current weekday in the
+    current locale in green foreground colour, use this:
+
+      grml_theme_add_token day '%D{%A}' '%F{green}' '%f'
+
+    Another example would be support for \$VIRTUAL_ENV:
+
+      function virtual_env_prompt () {
+        REPLY=\${VIRTUAL_ENV+\${VIRTUAL_ENV:t} }
+      }
+      grml_theme_add_token virtual-env -f virtual_env_prompt
+
+    After that, you will be able to use a changed \`items' style to
+    assemble your prompt.
+__EOF__
+}
+
+function grml_theme_add_token () {
+    emulate -L zsh
+    local name token pre post
+    local -i init funcall
+
+    if (( ARGC == 0 )); then
+        GRML_theme_add_token_usage
+        return 0
+    fi
+
+    init=0
+    funcall=0
+    pre=''
+    post=''
+    name=$1
+    shift
+    if [[ $1 == '-f' ]]; then
+        funcall=1
+        shift
+    elif [[ $1 == '-i' ]]; then
+        init=1
+        shift
+    fi
+
+    if (( ARGC == 0 )); then
+        printf '
+grml_theme_add_token: No token-string/function-name provided!\n\n'
+        GRML_theme_add_token_usage
+        return 1
+    fi
+    token=$1
+    shift
+    if (( ARGC != 0 && ARGC != 2 )); then
+        printf '
+grml_theme_add_token: <pre> and <post> need to by specified _both_!\n\n'
+        GRML_theme_add_token_usage
+        return 1
+    fi
+    if (( ARGC )); then
+        pre=$1
+        post=$2
+        shift 2
+    fi
+
+    if grml_theme_has_token $name; then
+        printf '
+grml_theme_add_token: Token `%s'\'' exists! Giving up!\n\n' $name
+        GRML_theme_add_token_usage
+        return 2
+    fi
+    if (( init )); then
+        $token $name
+        token=$REPLY
+    fi
+    grml_prompt_pre_default[$name]=$pre
+    grml_prompt_post_default[$name]=$post
+    if (( funcall )); then
+        grml_prompt_token_function[$name]=$token
+        grml_prompt_token_default[$name]=23
+    else
+        grml_prompt_token_default[$name]=$token
+    fi
+}
 
 function grml_typeset_and_wrap () {
     emulate -L zsh
@@ -1530,12 +2044,16 @@ function grml_prompt_addto () {
     for it in "${items[@]}"; do
         zstyle -s ":prompt:${grmltheme}:${lr}:items:$it" pre apre \
             || apre=${grml_prompt_pre_default[$it]}
-        zstyle -s ":prompt:grml:${grmltheme}:${lr}:$it" post apost \
+        zstyle -s ":prompt:${grmltheme}:${lr}:items:$it" post apost \
             || apost=${grml_prompt_post_default[$it]}
         zstyle -s ":prompt:${grmltheme}:${lr}:items:$it" token new \
             || new=${grml_prompt_token_default[$it]}
         typeset -g "${target}=${(P)target}${apre}"
-        case $it in
+        if (( ${+grml_prompt_token_function[$it]} )); then
+            ${grml_prompt_token_function[$it]} $it
+            typeset -g "${target}=${(P)target}${REPLY}"
+        else
+            case $it in
             battery)
                 grml_typeset_and_wrap $target $new '' ''
                 ;;
@@ -1558,7 +2076,8 @@ function grml_prompt_addto () {
                 fi
                 ;;
             *) typeset -g "${target}=${(P)target}${new}" ;;
-        esac
+            esac
+        fi
         typeset -g "${target}=${(P)target}${apost}"
     done
 }
@@ -1649,7 +2168,7 @@ if is437; then
         unset i
         zstyle ':prompt:grml(|-large|-chroot):right:setup' use-rprompt false
     elif (( EUID == 0 )); then
-        zstyle ':prompt:grml(|-large|-chroot):*:items:user' pre '%F{red}'
+        zstyle ':prompt:grml(|-large|-chroot):*:items:user' pre '%B%F{red}'
     fi
 
     # Finally enable one of the prompts.
@@ -1729,7 +2248,7 @@ function grml_control_xterm_title () {
 }
 
 zrcautoload add-zsh-hook || add-zsh-hook () { :; }
-if [[ $NOPRECMD -gt 0 ]]; then
+if [[ $NOPRECMD -eq 0 ]]; then
     add-zsh-hook precmd grml_reset_screen_title
     add-zsh-hook precmd grml_vcs_to_screen_title
     add-zsh-hook preexec grml_maintain_name
@@ -1773,8 +2292,8 @@ fi
 
 # do we have GNU ls with color-support?
 if [[ "$TERM" != dumb ]]; then
-    #a1# List files with colors (\kbd{ls -b -CF \ldots})
-    alias ls='ls -b -CF '${ls_options:+"${ls_options[*]}"}
+    #a1# List files with colors (\kbd{ls -CF \ldots})
+    alias ls='ls -CF '${ls_options:+"${ls_options[*]}"}
     #a1# List all files, with colors (\kbd{ls -la \ldots})
     alias la='ls -la '${ls_options:+"${ls_options[*]}"}
     #a1# List files with long colored list, without dotfiles (\kbd{ls -l \ldots})
@@ -1784,7 +2303,7 @@ if [[ "$TERM" != dumb ]]; then
     #a1# List files with long colored list, append qualifier to filenames (\kbd{ls -lF \ldots})\\&\quad(\kbd{/} for directories, \kbd{@} for symlinks ...)
     alias l='ls -lF '${ls_options:+"${ls_options[*]}"}
 else
-    alias ls='ls -b -CF'
+    alias ls='ls -CF'
     alias la='ls -la'
     alias ll='ls -l'
     alias lh='ls -hAl'
@@ -1958,173 +2477,6 @@ unlimit
 is425 && limit stack 8192
 isgrmlcd && limit core 0 # important for a live-cd-system
 limit -s
-
-# completion system
-
-# called later (via is4 && grmlcomp)
-# note: use 'zstyle' for getting current settings
-#         press ^xh (control-x h) for getting tags in context; ^x? (control-x ?) to run complete_debug with trace output
-grmlcomp() {
-    # TODO: This could use some additional information
-
-    # allow one error for every three characters typed in approximate completer
-    zstyle ':completion:*:approximate:'    max-errors 'reply=( $((($#PREFIX+$#SUFFIX)/3 )) numeric )'
-
-    # don't complete backup files as executables
-    zstyle ':completion:*:complete:-command-::commands' ignored-patterns '(aptitude-*|*\~)'
-
-    # start menu completion only if it could find no unambiguous initial string
-    zstyle ':completion:*:correct:*'       insert-unambiguous true
-    zstyle ':completion:*:corrections'     format $'%{\e[0;31m%}%d (errors: %e)%{\e[0m%}'
-    zstyle ':completion:*:correct:*'       original true
-
-    # activate color-completion
-    zstyle ':completion:*:default'         list-colors ${(s.:.)LS_COLORS}
-
-    # format on completion
-    zstyle ':completion:*:descriptions'    format $'%{\e[0;31m%}completing %B%d%b%{\e[0m%}'
-
-    # automatically complete 'cd -<tab>' and 'cd -<ctrl-d>' with menu
-    # zstyle ':completion:*:*:cd:*:directory-stack' menu yes select
-
-    # insert all expansions for expand completer
-    zstyle ':completion:*:expand:*'        tag-order all-expansions
-    zstyle ':completion:*:history-words'   list false
-
-    # activate menu
-    zstyle ':completion:*:history-words'   menu yes
-
-    # ignore duplicate entries
-    zstyle ':completion:*:history-words'   remove-all-dups yes
-    zstyle ':completion:*:history-words'   stop yes
-
-    # match uppercase from lowercase
-    zstyle ':completion:*'                 matcher-list 'm:{a-z}={A-Z}'
-
-    # separate matches into groups
-    zstyle ':completion:*:matches'         group 'yes'
-    zstyle ':completion:*'                 group-name ''
-
-    if [[ "$NOMENU" -eq 0 ]] ; then
-        # if there are more than 5 options allow selecting from a menu
-        zstyle ':completion:*'               menu select=5
-    else
-        # don't use any menus at all
-        setopt no_auto_menu
-    fi
-
-    zstyle ':completion:*:messages'        format '%d'
-    zstyle ':completion:*:options'         auto-description '%d'
-
-    # describe options in full
-    zstyle ':completion:*:options'         description 'yes'
-
-    # on processes completion complete all user processes
-    zstyle ':completion:*:processes'       command 'ps -au$USER'
-
-    # offer indexes before parameters in subscripts
-    zstyle ':completion:*:*:-subscript-:*' tag-order indexes parameters
-
-    # provide verbose completion information
-    zstyle ':completion:*'                 verbose true
-
-    # recent (as of Dec 2007) zsh versions are able to provide descriptions
-    # for commands (read: 1st word in the line) that it will list for the user
-    # to choose from. The following disables that, because it's not exactly fast.
-    zstyle ':completion:*:-command-:*:'    verbose false
-
-    # set format for warnings
-    zstyle ':completion:*:warnings'        format $'%{\e[0;31m%}No matches for:%{\e[0m%} %d'
-
-    # define files to ignore for zcompile
-    zstyle ':completion:*:*:zcompile:*'    ignored-patterns '(*~|*.zwc)'
-    zstyle ':completion:correct:'          prompt 'correct to: %e'
-
-    # Ignore completion functions for commands you don't have:
-    zstyle ':completion::(^approximate*):*:functions' ignored-patterns '_*'
-
-    # Provide more processes in completion of programs like killall:
-    zstyle ':completion:*:processes-names' command 'ps c -u ${USER} -o command | uniq'
-
-    # complete manual by their section
-    zstyle ':completion:*:manuals'    separate-sections true
-    zstyle ':completion:*:manuals.*'  insert-sections   true
-    zstyle ':completion:*:man:*'      menu yes select
-
-    # Search path for sudo completion
-    zstyle ':completion:*:sudo:*' command-path /usr/local/sbin \
-                                               /usr/local/bin  \
-                                               /usr/sbin       \
-                                               /usr/bin        \
-                                               /sbin           \
-                                               /bin            \
-                                               /usr/X11R6/bin
-
-    # provide .. as a completion
-    zstyle ':completion:*' special-dirs ..
-
-    # run rehash on completion so new installed program are found automatically:
-    _force_rehash() {
-        (( CURRENT == 1 )) && rehash
-        return 1
-    }
-
-    ## correction
-    # some people don't like the automatic correction - so run 'NOCOR=1 zsh' to deactivate it
-    if [[ "$NOCOR" -gt 0 ]] ; then
-        zstyle ':completion:*' completer _oldlist _expand _force_rehash _complete _files _ignored
-        setopt nocorrect
-    else
-        # try to be smart about when to use what completer...
-        setopt correct
-        zstyle -e ':completion:*' completer '
-            if [[ $_last_try != "$HISTNO$BUFFER$CURSOR" ]] ; then
-                _last_try="$HISTNO$BUFFER$CURSOR"
-                reply=(_complete _match _ignored _prefix _files)
-            else
-                if [[ $words[1] == (rm|mv) ]] ; then
-                    reply=(_complete _files)
-                else
-                    reply=(_oldlist _expand _force_rehash _complete _ignored _correct _approximate _files)
-                fi
-            fi'
-    fi
-
-    # command for process lists, the local web server details and host completion
-    zstyle ':completion:*:urls' local 'www' '/var/www/' 'public_html'
-
-    # caching
-    [[ -d $ZSHDIR/cache ]] && zstyle ':completion:*' use-cache yes && \
-                            zstyle ':completion::complete:*' cache-path $ZSHDIR/cache/
-
-    # host completion
-    if is42 ; then
-        [[ -r ~/.ssh/known_hosts ]] && _ssh_hosts=(${${${${(f)"$(<$HOME/.ssh/known_hosts)"}:#[\|]*}%%\ *}%%,*}) || _ssh_hosts=()
-        [[ -r /etc/hosts ]] && : ${(A)_etc_hosts:=${(s: :)${(ps:\t:)${${(f)~~"$(</etc/hosts)"}%%\#*}##[:blank:]#[^[:blank:]]#}}} || _etc_hosts=()
-    else
-        _ssh_hosts=()
-        _etc_hosts=()
-    fi
-    hosts=(
-        $(hostname)
-        "$_ssh_hosts[@]"
-        "$_etc_hosts[@]"
-        localhost
-    )
-    zstyle ':completion:*:hosts' hosts $hosts
-    # TODO: so, why is this here?
-    #  zstyle '*' hosts $hosts
-
-    # use generic completion system for programs not yet defined; (_gnu_generic works
-    # with commands that provide a --help option with "standard" gnu-like output.)
-    for compcom in cp deborphan df feh fetchipac head hnb ipacsum mv \
-                   pal stow tail uname ; do
-        [[ -z ${_comps[$compcom]} ]] && compdef _gnu_generic ${compcom}
-    done; unset compcom
-
-    # see upgrade function in this file
-    compdef _hosts upgrade
-}
 
 # grmlstuff
 grmlstuff() {
@@ -2361,128 +2713,6 @@ H-Glob() {
 }
 alias help-zshglob=H-Glob
 
-#v1# set number of lines to display per page
-HELP_LINES_PER_PAGE=20
-#v1# set location of help-zle cache file
-HELP_ZLE_CACHE_FILE=~/.cache/zsh_help_zle_lines.zsh
-# helper function for help-zle, actually generates the help text
-help_zle_parse_keybindings()
-{
-    emulate -L zsh
-    setopt extendedglob
-    unsetopt ksharrays  #indexing starts at 1
-
-    #v1# choose files that help-zle will parse for keybindings
-    ((${+HELPZLE_KEYBINDING_FILES})) || HELPZLE_KEYBINDING_FILES=( /etc/zsh/zshrc ~/.zshrc.pre ~/.zshrc ~/.zshrc.local )
-
-    if [[ -r $HELP_ZLE_CACHE_FILE ]]; then
-        local load_cache=0
-        for f ($HELPZLE_KEYBINDING_FILES) [[ $f -nt $HELP_ZLE_CACHE_FILE ]] && load_cache=1
-        [[ $load_cache -eq 0 ]] && . $HELP_ZLE_CACHE_FILE && return
-    fi
-
-    #fill with default keybindings, possibly to be overwriten in a file later
-    #Note that due to zsh inconsistency on escaping assoc array keys, we encase the key in '' which we will remove later
-    local -A help_zle_keybindings
-    help_zle_keybindings['<Ctrl>@']="set MARK"
-    help_zle_keybindings['<Ctrl>x<Ctrl>j']="vi-join lines"
-    help_zle_keybindings['<Ctrl>x<Ctrl>b']="jump to matching brace"
-    help_zle_keybindings['<Ctrl>x<Ctrl>u']="undo"
-    help_zle_keybindings['<Ctrl>_']="undo"
-    help_zle_keybindings['<Ctrl>x<Ctrl>f<c>']="find <c> in cmdline"
-    help_zle_keybindings['<Ctrl>a']="goto beginning of line"
-    help_zle_keybindings['<Ctrl>e']="goto end of line"
-    help_zle_keybindings['<Ctrl>t']="transpose charaters"
-    help_zle_keybindings['<Alt>t']="transpose words"
-    help_zle_keybindings['<Alt>s']="spellcheck word"
-    help_zle_keybindings['<Ctrl>k']="backward kill buffer"
-    help_zle_keybindings['<Ctrl>u']="forward kill buffer"
-    help_zle_keybindings['<Ctrl>y']="insert previously killed word/string"
-    help_zle_keybindings["<Alt>'"]="quote line"
-    help_zle_keybindings['<Alt>"']="quote from mark to cursor"
-    help_zle_keybindings['<Alt><arg>']="repeat next cmd/char <arg> times (<Alt>-<Alt>1<Alt>0a -> -10 times 'a')"
-    help_zle_keybindings['<Alt>u']="make next word Uppercase"
-    help_zle_keybindings['<Alt>l']="make next word lowercase"
-    help_zle_keybindings['<Ctrl>xd']="preview expansion under cursor"
-    help_zle_keybindings['<Alt>q']="push current CL into background, freeing it. Restore on next CL"
-    help_zle_keybindings['<Alt>.']="insert (and interate through) last word from prev CLs"
-    help_zle_keybindings['<Alt>,']="complete word from newer history (consecutive hits)"
-    help_zle_keybindings['<Alt>m']="repeat last typed word on current CL"
-    help_zle_keybindings['<Ctrl>v']="insert next keypress symbol literally (e.g. for bindkey)"
-    help_zle_keybindings['!!:n*<Tab>']="insert last n arguments of last command"
-    help_zle_keybindings['!!:n-<Tab>']="insert arguments n..N-2 of last command (e.g. mv s s d)"
-    help_zle_keybindings['<Alt>h']="show help/manpage for current command"
-
-    #init global variables
-    unset help_zle_lines help_zle_sln
-    typeset -g -a help_zle_lines
-    typeset -g help_zle_sln=1
-
-    local k v
-    local lastkeybind_desc contents     #last description starting with #k# that we found
-    local num_lines_elapsed=0            #number of lines between last description and keybinding
-    #search config files in the order they a called (and thus the order in which they overwrite keybindings)
-    for f in $HELPZLE_KEYBINDING_FILES; do
-        [[ -r "$f" ]] || continue   #not readable ? skip it
-        contents="$(<$f)"
-        for cline in "${(f)contents}"; do
-            #zsh pattern: matches lines like: #k# ..............
-            if [[ "$cline" == (#s)[[:space:]]#\#k\#[[:space:]]##(#b)(*)[[:space:]]#(#e) ]]; then
-                lastkeybind_desc="$match[*]"
-                num_lines_elapsed=0
-            #zsh pattern: matches lines that set a keybinding using bindkey or compdef -k
-            #             ignores lines that are commentend out
-            #             grabs first in '' or "" enclosed string with length between 1 and 6 characters
-            elif [[ "$cline" == [^#]#(bindkey|compdef -k)[[:space:]](*)(#b)(\"((?)(#c1,6))\"|\'((?)(#c1,6))\')(#B)(*)  ]]; then
-                #description prevously found ? description not more than 2 lines away ? keybinding not empty ?
-                if [[ -n $lastkeybind_desc && $num_lines_elapsed -lt 2 && -n $match[1] ]]; then
-                    #substitute keybinding string with something readable
-                    k=${${${${${${${match[1]/\\e\^h/<Alt><BS>}/\\e\^\?/<Alt><BS>}/\\e\[5~/<PageUp>}/\\e\[6~/<PageDown>}//(\\e|\^\[)/<Alt>}//\^/<Ctrl>}/3~/<Alt><Del>}
-                    #put keybinding in assoc array, possibly overwriting defaults or stuff found in earlier files
-                    #Note that we are extracting the keybinding-string including the quotes (see Note at beginning)
-                    help_zle_keybindings[${k}]=$lastkeybind_desc
-                fi
-                lastkeybind_desc=""
-            else
-              ((num_lines_elapsed++))
-            fi
-        done
-    done
-    unset contents
-    #calculate length of keybinding column
-    local kstrlen=0
-    for k (${(k)help_zle_keybindings[@]}) ((kstrlen < ${#k})) && kstrlen=${#k}
-    #convert the assoc array into preformated lines, which we are able to sort
-    for k v in ${(kv)help_zle_keybindings[@]}; do
-        #pad keybinding-string to kstrlen chars and remove outermost characters (i.e. the quotes)
-        help_zle_lines+=("${(r:kstrlen:)k[2,-2]}${v}")
-    done
-    #sort lines alphabetically
-    help_zle_lines=("${(i)help_zle_lines[@]}")
-    [[ -d ${HELP_ZLE_CACHE_FILE:h} ]] || mkdir -p "${HELP_ZLE_CACHE_FILE:h}"
-    echo "help_zle_lines=(${(q)help_zle_lines[@]})" >| $HELP_ZLE_CACHE_FILE
-    zcompile $HELP_ZLE_CACHE_FILE
-}
-typeset -g help_zle_sln
-typeset -g -a help_zle_lines
-
-# Provides (partially autogenerated) help on keybindings and the zsh line editor
-help-zle()
-{
-    emulate -L zsh
-    unsetopt ksharrays  #indexing starts at 1
-    #help lines already generated ? no ? then do it
-    [[ ${+functions[help_zle_parse_keybindings]} -eq 1 ]] && {help_zle_parse_keybindings && unfunction help_zle_parse_keybindings}
-    #already displayed all lines ? go back to the start
-    [[ $help_zle_sln -gt ${#help_zle_lines} ]] && help_zle_sln=1
-    local sln=$help_zle_sln
-    #note that help_zle_sln is a global var, meaning we remember the last page we viewed
-    help_zle_sln=$((help_zle_sln + HELP_LINES_PER_PAGE))
-    zle -M "${(F)help_zle_lines[sln,help_zle_sln-1]}"
-}
-#k# display help for keybindings and ZLE
-zle -N help-zle && bindkey '^xz' help-zle # note: cycle pages with consecutive use of '^xz'
-
 # grep for running process, like: 'any vim'
 any() {
     emulate -L zsh
@@ -2688,42 +2918,6 @@ cdt() {
     echo "$t"
     builtin cd "$t"
 }
-
-#f5# Create directory under cursor or the selected area
-inplaceMkDirs() {
-    # Press ctrl-xM to create the directory under the cursor or the selected area.
-    # To select an area press ctrl-@ or ctrl-space and use the cursor.
-    # Use case: you type "mv abc ~/testa/testb/testc/" and remember that the
-    # directory does not exist yet -> press ctrl-XM and problem solved
-    local PATHTOMKDIR
-    if ((REGION_ACTIVE==1)); then
-        local F=$MARK T=$CURSOR
-        if [[ $F -gt $T ]]; then
-            F=${CURSOR}
-            T=${MARK}
-        fi
-        # get marked area from buffer and eliminate whitespace
-        PATHTOMKDIR=${BUFFER[F+1,T]%%[[:space:]]##}
-        PATHTOMKDIR=${PATHTOMKDIR##[[:space:]]##}
-    else
-        local bufwords iword
-        bufwords=(${(z)LBUFFER})
-        iword=${#bufwords}
-        bufwords=(${(z)BUFFER})
-        PATHTOMKDIR="${(Q)bufwords[iword]}"
-    fi
-    [[ -z "${PATHTOMKDIR}" ]] && return 1
-    PATHTOMKDIR=${~PATHTOMKDIR}
-    if [[ -e "${PATHTOMKDIR}" ]]; then
-        zle -M " path already exists, doing nothing"
-    else
-        zle -M "$(mkdir -p -v "${PATHTOMKDIR}")"
-        zle end-of-line
-    fi
-}
-
-#k# mkdir -p <dir> from string under cursor or marked area
-zle -N inplaceMkDirs && bindkey '^xM' inplaceMkDirs
 
 #f5# List files which have been accessed within the last {\it n} days, {\it n} defaults to 1
 accessed() {
