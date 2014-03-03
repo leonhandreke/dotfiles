@@ -13,9 +13,6 @@ fi
 # https://github.com/defunkt/hub
 # eval "$(hub alias -s)"
 
-# Don't make yum ask
-alias "yum install"="yum install -y"
-
 # Replicate the Mac OS open command
 alias open="xdg-open"
 
