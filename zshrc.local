@@ -3,7 +3,7 @@ export LANG="en_US.UTF-8"
 export LC_ALL="en_US.UTF-8"
 
 # Append some useful paths to the PATH
-PATH=$HOME/.bin:/sbin:/usr/local/sbin:/usr/local/share/npm/bin:/usr/local/share/python3:$PATH
+PATH=$HOME/bin:/sbin:/usr/local/sbin:/usr/local/share/npm/bin:/usr/local/share/python3:$PATH
 
 # Mac OS X-specific configuration for MacVim
 if [[ `uname` == "Darwin" ]]; then
