@@ -18,6 +18,7 @@ Bundle 'kien/ctrlp.vim'
 Bundle 'bling/vim-airline'
 Bundle 'bling/vim-bufferline'
 Bundle 'vim-scripts/restore_view.vim'
+Bundle 'mileszs/ack.vim'
 
 " Syntax support
 Bundle 'Glench/Vim-Jinja2-Syntax'
