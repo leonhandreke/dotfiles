@@ -29,6 +29,7 @@ Bundle 'uarun/vim-protobuf'
 Bundle 'kchmck/vim-coffee-script'
 Bundle 'vim-pandoc/vim-pandoc'
 Bundle 'rosstimson/scala-vim-support'
+Bundle 'peterhoeg/vim-qml'
 Bundle 'klen/python-mode'
 
 Bundle 'rainbow_parentheses.vim'
