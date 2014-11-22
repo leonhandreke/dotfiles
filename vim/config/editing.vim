@@ -16,3 +16,6 @@ nnoremap Q <nop>
 
 " Enable syntax highlighting
 syntax on
+
+" Highlight search terms
+set hlsearch

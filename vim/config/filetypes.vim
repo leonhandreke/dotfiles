@@ -13,5 +13,8 @@ autocmd FileType cmake 		set expandtab tabstop=4 shiftwidth=4
 autocmd FileType gitcommit	set textwidth=72
 autocmd FileType pandoc		set textwidth=0 nofoldenable
 autocmd FileType mail		set textwidth=80
+autocmd FileType proto		set expandtab tabstop=2
+
+autocmd FileType java		let &colorcolumn=join(range(101,999),",")
 
 au BufRead,BufNewFile *.md set filetype=markdown textwidth=120
