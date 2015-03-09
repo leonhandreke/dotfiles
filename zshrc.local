@@ -21,3 +21,13 @@ export NODE_PATH="/usr/local/lib/node"
 export EDITOR=vim
 
 export JAVA_HOME="/usr/java/latest"
+
+export HISTSIZE=10000000
+export SAVEHIST=10000000
+
+bindkey '^w' backward-kill-word
+bindkey '^r' history-incremental-search-backward
+bindkey '^g' per-directory-history-toggle-history
+
+# gitgoodies
+unalias gg
