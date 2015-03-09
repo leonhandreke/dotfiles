@@ -21,3 +21,12 @@
 [url "git@git.kde.org:"]
 	pushInsteadOf = kde:
 
+[alias]
+	l = log --pretty=format:'%C(yellow)%h%C(white) %an <%ae> %>|(80)%ai%Creset%n%C(bold)%w(0,4,4)%s%C(reset)%n%+b'
+	ll = log --stat
+	lg = log
+	lp = log -p
+	tweak = commit --amend --no-edit
+	set-upstream = branch --set-upstream-to
+	co = checkout
+	chekcout = checkout
