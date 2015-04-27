@@ -30,3 +30,4 @@
 	set-upstream = branch --set-upstream-to
 	co = checkout
 	chekcout = checkout
+	c = "!f() { git commit -a -m \"$@\"; }; f"
