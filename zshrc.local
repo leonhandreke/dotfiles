@@ -3,7 +3,8 @@ export LANG="en_US.UTF-8"
 export LC_ALL="en_US.UTF-8"
 
 # Append some useful paths to the PATH
-PATH=$HOME/bin:/sbin:/usr/local/sbin:/usr/local/share/npm/bin:/usr/local/share/python3:$PATH
+PATH=$HOME/bin:/sbin:/usr/local/sbin:/usr/local/share/npm/bin:/usr/local/share/python3:/usr/lib64/node_modules/.bin:$PATH
+export PATH=/opt/gcc4mbed/gcc-arm-none-eabi/bin/:$PATH
 
 # Mac OS X-specific configuration for MacVim
 if [[ `uname` == "Darwin" ]]; then
@@ -14,10 +15,12 @@ fi
 # eval "$(hub alias -s)"
 
 # Replicate the Mac OS open command
-alias open="xdg-open"
+alias open="kde-open"
 
-# npm library path
-export NODE_PATH="/usr/local/lib/node"
+alias json="python2 -m json.tool"
+
+alias sm="sm ''"
+
 export EDITOR=vim
 
 export JAVA_HOME="/usr/java/latest"
