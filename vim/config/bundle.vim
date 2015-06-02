@@ -11,12 +11,15 @@ Bundle 'sjl/gundo.vim'
 Bundle 'nathanaelkane/vim-indent-guides'
 Bundle 'MarcWeber/vim-addon-local-vimrc'
 Bundle 'altercation/vim-colors-solarized'
-Bundle 'Valloric/YouCompleteMe'
+"Bundle 'Valloric/YouCompleteMe'
 Bundle 'scrooloose/syntastic'
 Bundle 'kien/ctrlp.vim'
 Bundle 'bling/vim-airline'
 Bundle 'vim-scripts/restore_view.vim'
 Bundle 'mileszs/ack.vim'
+Bundle 'terryma/vim-expand-region'
+Bundle 'vim-scripts/gitignore'
+Bundle 'tpope/vim-sleuth'
 
 " Syntax support
 Bundle 'Glench/Vim-Jinja2-Syntax'
@@ -31,7 +34,6 @@ Bundle 'peterhoeg/vim-qml'
 Bundle 'klen/python-mode'
 
 Bundle 'rainbow_parentheses.vim'
-Bundle 'LaTeX-Suite-aka-Vim-LaTeX'
 
 filetype on
 filetype plugin indent on
