@@ -19,3 +19,8 @@ syntax on
 
 " Highlight search terms
 set hlsearch
+
+set undofile
+set undodir=~/.vim/undodir
+
+set autoread
