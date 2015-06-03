@@ -33,3 +33,7 @@ bindkey '^r' history-incremental-search-backward
 bindkey '^g' per-directory-history-toggle-history
 
 alias upstream="git for-each-ref --format='%(upstream:short)' $(git symbolic-ref -q HEAD)"
+
+function ed {
+	vim -O $(find . | grep  "$1")
+}
