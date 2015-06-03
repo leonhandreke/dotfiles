@@ -27,13 +27,17 @@ export JAVA_HOME="/usr/java/latest"
 
 export HISTSIZE=10000000
 export SAVEHIST=10000000
-
-bindkey '^w' backward-kill-word
-bindkey '^r' history-incremental-search-backward
-bindkey '^g' per-directory-history-toggle-history
+setopt APPEND_HISTORY
 
 alias upstream="git for-each-ref --format='%(upstream:short)' $(git symbolic-ref -q HEAD)"
 
 function ed {
 	vim -O $(find . | grep  "$1")
 }
+
+source $HOME/.zaw/zaw.zsh
+bindkey '^r' zaw-history
+zstyle ':filter-select' max-lines 3
+zstyle ':filter-select:highlight' matched fg=green
+zstyle ':filter-select' case-insensitive yes
+zstyle ':filter-select' extended-search yes
