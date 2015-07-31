@@ -1,2 +1,6 @@
 *~
 *.log
+vim/view
+vim/eclim
+vim/plugin
+vim/.netrwhist
