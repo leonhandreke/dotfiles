@@ -4,4 +4,4 @@ ignore = [
 	'.git',
 	'.gitignore',
 	'README.md']
-packages = ['config']
+packages = ['config', 'oh-my-zsh']

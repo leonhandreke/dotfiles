@@ -47,11 +47,10 @@ DEFAULT_USER="lhandreke"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git wd colorize)
+plugins=(git wd colorize zsh-syntax-highlighting history-substring-search)
 
 # User configuration
 
-export PATH="/usr/local/google/home/lhandreke/bin:/sbin:/usr/local/sbin:/usr/local/share/npm/bin:/usr/local/share/python3:/usr/local/google/home/lhandreke/bin:/usr/lib/google-golang/bin:/usr/local/buildtools/java/jdk/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/google/home/lhandreke/Development/gittools/google3/experimental/chrispurcell/gittools"
 # export MANPATH="/usr/local/man:$MANPATH"
 
 source $ZSH/oh-my-zsh.sh
