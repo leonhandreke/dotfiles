@@ -34,10 +34,3 @@ alias upstream="git for-each-ref --format='%(upstream:short)' $(git symbolic-ref
 function ed {
 	vim -O $(find . | grep  "$1")
 }
-
-source $HOME/.zaw/zaw.zsh
-bindkey '^r' zaw-history
-zstyle ':filter-select' max-lines 3
-zstyle ':filter-select:highlight' matched fg=green
-zstyle ':filter-select' case-insensitive yes
-zstyle ':filter-select' extended-search yes
