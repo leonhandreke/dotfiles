@@ -1,5 +1,5 @@
 " Set leader key
-let mapleader=","
+let mapleader=" "
 
 vmap v <Plug>(expand_region_expand)
 vmap <C-v> <Plug>(expand_region_shrink)
@@ -16,6 +16,8 @@ nmap <Leader>p "+p
 nmap <Leader>P "+P
 vmap <Leader>p "+p
 vmap <Leader>P "+P
+
+nnoremap <Leader>m :set paste!<CR>
 
 "Stop that stupid window from popping up:
 map q: :q
