@@ -23,14 +23,24 @@ alias sm="sm ''"
 
 export EDITOR=vim
 
-export JAVA_HOME="/usr/java/latest"
-
 export HISTSIZE=10000000
 export SAVEHIST=10000000
 setopt APPEND_HISTORY
 
-alias upstream="git for-each-ref --format='%(upstream:short)' $(git symbolic-ref -q HEAD)"
+# Show upstream of a branch
+alias upstream="git for-each-ref --format='%(upstream:short)' \$(git symbolic-ref -q HEAD)"
+
+# Show recently worked on branches
+alias git-recent="git for-each-ref --count=30 --sort=-committerdate refs/heads/ --format='%(refname:short)' | grep -v 'm--'"
 
 function ed {
 	vim -O $(find . | grep  "$1")
 }
+
+alias tmux="TERM=screen-256color-bce tmux"
+
+timestamp2date() {
+	date -d "@$1"
+	TZ=":US/Eastern" date -d "@$1"
+}
+alias ts=timestamp2date
