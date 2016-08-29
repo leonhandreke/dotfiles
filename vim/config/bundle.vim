@@ -23,7 +23,7 @@ Bundle 'tpope/vim-sleuth'
 
 " Syntax support
 Bundle 'Glench/Vim-Jinja2-Syntax'
-Bundle 'jnwhiteh/vim-golang'
+Bundle 'fatih/vim-go'
 Bundle 'rodjek/vim-puppet'
 Bundle 'vim-scripts/iptables'
 Bundle 'uarun/vim-protobuf'

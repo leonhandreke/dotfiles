@@ -23,3 +23,12 @@ let g:ycm_autoclose_preview_window_after_completion = 1
 let g:ctrlp_regexp = 1
 
 let g:ctrlp_use_caching = 0
+
+let g:go_highlight_functions = 1
+let g:go_highlight_methods = 1
+let g:go_highlight_structs = 1
+let g:go_highlight_interfaces = 1
+let g:go_highlight_operators = 1
+let g:go_highlight_build_constraints = 1
+
+let g:go_fmt_command = "goimports"
