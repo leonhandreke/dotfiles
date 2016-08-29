@@ -9,3 +9,5 @@ set bg=dark
 colorscheme solarized
 
 let g:airline_powerline_fonts = 1
+
+set nofoldenable
