@@ -11,7 +11,7 @@ PRIMARY_FG="white"
 ZSH_THEME="agnoster"
 
 # To hide username prompt in agnoster
-DEFAULT_USER="lhandreke"
+DEFAULT_USER="leon"
 
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
