@@ -2,9 +2,9 @@
 export LANG="en_US.UTF-8"
 export LC_ALL="en_US.UTF-8"
 
-# Append some useful paths to the PATH
-export PATH=$PATH:$HOME/bin
-export PATH=/opt/gcc4mbed/gcc-arm-none-eabi/bin/:$PATH
+# No quotes in ls 
+# https://unix.stackexchange.com/questions/258679/why-is-ls-suddenly-wrapping-items-with-spaces-in-single-quotes
+export QUOTING_STYLE=literal
 
 # Mac OS X-specific configuration for MacVim
 if [[ `uname` == "Darwin" ]]; then
@@ -15,10 +15,15 @@ fi
 # eval "$(hub alias -s)"
 
 # Replicate the Mac OS open command
-alias open="kde-open"
+alias open="xdg-open"
 
 alias json="python2 -m json.tool"
 
+# natural sort
+alias ls="ls -v --color=tty"
+
+
+# sm empty startup
 alias sm="sm ''"
 
 export EDITOR=vim
