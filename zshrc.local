@@ -49,3 +49,4 @@ timestamp2date() {
 	TZ=":US/Eastern" date -d "@$1"
 }
 alias ts=timestamp2date
+alias a="sudo apt"
