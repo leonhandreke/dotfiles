@@ -24,3 +24,6 @@ set undofile
 set undodir=~/.vim/undodir
 
 set autoread
+
+set nospell
+set spelllang=de

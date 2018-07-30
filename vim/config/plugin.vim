@@ -14,6 +14,8 @@ let g:pymode_lint_ignore = "E501,E261,E126,E302"
 
 let g:ycm_autoclose_preview_window_after_completion = 1
 
+"let g:deoplete#enable_at_startup = 1
+
 "let g:EclimCompletionMethod = 'omnifunc'
 "nmap <Leader>o :JavaImportOrganize<CR>
 "nmap <Leader>i :JavaImport<CR>
@@ -32,3 +34,8 @@ let g:go_highlight_operators = 1
 let g:go_highlight_build_constraints = 1
 
 let g:go_fmt_command = "goimports"
+
+" fzf fuzzy finding
+let g:nv_use_short_pathnames = 1
+let g:nv_search_paths = ['~/Dropbox/notes']
+nnoremap <silent> <c-s> :NV
