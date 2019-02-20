@@ -37,6 +37,8 @@ Bundle 'peterhoeg/vim-qml'
 
 Bundle 'rainbow_parentheses.vim'
 
+Bundle 'jamessan/vim-gnupg'
+
 " Dependency for vim-textobj-quote
 "Bundle 'kana/vim-textobj-user'
 "Bundle 'reedes/vim-textobj-quote'
