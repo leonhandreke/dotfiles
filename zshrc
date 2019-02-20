@@ -53,7 +53,7 @@ export FZF_BASE=~/Development/fzf
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git wd colorize zsh-syntax-highlighting history-substring-search osx vi-mode fzf)
+plugins=(git wd colorize zsh-syntax-highlighting history-substring-search osx vi-mode fzf virtualenv)
 
 # User configuration
 
