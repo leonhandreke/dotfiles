@@ -1,44 +1,39 @@
-filetype off
-set rtp+=~/.vim/bundle/vundle/
-call vundle#rc()
+call plug#begin('~/.vim/plugged')
 
-" Let Vundle take care of itself
-Bundle 'gmarik/vundle'
+Plug 'tpope/vim-git'
+Plug 'tpope/vim-fugitive'
+Plug 'sjl/gundo.vim'
+Plug 'nathanaelkane/vim-indent-guides'
+Plug 'MarcWeber/vim-addon-local-vimrc'
+Plug 'Shougo/deoplete.nvim'
+Plug 'scrooloose/syntastic'
+Plug 'kien/ctrlp.vim'
+Plug 'bling/vim-airline'
+Plug 'vim-scripts/restore_view.vim'
+Plug 'mileszs/ack.vim'
+Plug 'terryma/vim-expand-region'
+Plug 'vim-scripts/gitignore'
+Plug 'tpope/vim-sleuth'
+Plug 'ledger/vim-ledger'
+Plug 'icymind/NeoSolarized'
 
-Bundle 'tpope/vim-git'
-Bundle 'tpope/vim-fugitive'
-Bundle 'sjl/gundo.vim'
-Bundle 'nathanaelkane/vim-indent-guides'
-Bundle 'MarcWeber/vim-addon-local-vimrc'
-Bundle 'Shougo/deoplete.nvim'
-Bundle 'scrooloose/syntastic'
-Bundle 'kien/ctrlp.vim'
-Bundle 'bling/vim-airline'
-Bundle 'vim-scripts/restore_view.vim'
-Bundle 'mileszs/ack.vim'
-Bundle 'terryma/vim-expand-region'
-Bundle 'vim-scripts/gitignore'
-Bundle 'tpope/vim-sleuth'
-Bundle 'ledger/vim-ledger'
-Bundle 'icymind/NeoSolarized'
+Plug 'Glench/Vim-Jinja2-Syntax'
+Plug 'fatih/vim-go'
+Plug 'rodjek/vim-puppet'
+Plug 'vim-scripts/iptables'
+Plug 'uarun/vim-protobuf'
+Plug 'kchmck/vim-coffee-script'
+Plug 'vim-pandoc/vim-pandoc'
+Plug 'vim-pandoc/vim-pandoc-syntax'
+Plug 'rosstimson/scala-vim-support'
+Plug 'peterhoeg/vim-qml'
+Plug 'jamessan/vim-gnupg'
+Plug 'vim-latex/vim-latex'
 
-" Syntax support
-Bundle 'Glench/Vim-Jinja2-Syntax'
-Bundle 'fatih/vim-go'
-Bundle 'rodjek/vim-puppet'
-Bundle 'vim-scripts/iptables'
-Bundle 'uarun/vim-protobuf'
-Bundle 'kchmck/vim-coffee-script'
-Bundle 'vim-pandoc/vim-pandoc'
-Bundle 'vim-pandoc/vim-pandoc-syntax'
-Bundle 'rosstimson/scala-vim-support'
-Bundle 'peterhoeg/vim-qml'
+" Completions
+Plug 'zchee/deoplete-jedi'
+Plug 'zchee/deoplete-go', { 'do': 'make'}
+Plug 'Shougo/neco-syntax'
 
-Bundle 'rainbow_parentheses.vim'
+call plug#end()
 
-Bundle 'jamessan/vim-gnupg'
-
-Bundle 'vim-latex/vim-latex'
-
-filetype on
-filetype plugin indent on
