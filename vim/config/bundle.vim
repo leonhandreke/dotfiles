@@ -10,8 +10,6 @@ Bundle 'tpope/vim-fugitive'
 Bundle 'sjl/gundo.vim'
 Bundle 'nathanaelkane/vim-indent-guides'
 Bundle 'MarcWeber/vim-addon-local-vimrc'
-"Bundle 'altercation/vim-colors-solarized'
-"Bundle 'Valloric/YouCompleteMe'
 Bundle 'Shougo/deoplete.nvim'
 Bundle 'scrooloose/syntastic'
 Bundle 'kien/ctrlp.vim'
@@ -32,6 +30,7 @@ Bundle 'vim-scripts/iptables'
 Bundle 'uarun/vim-protobuf'
 Bundle 'kchmck/vim-coffee-script'
 Bundle 'vim-pandoc/vim-pandoc'
+Bundle 'vim-pandoc/vim-pandoc-syntax'
 Bundle 'rosstimson/scala-vim-support'
 Bundle 'peterhoeg/vim-qml'
 
@@ -39,18 +38,7 @@ Bundle 'rainbow_parentheses.vim'
 
 Bundle 'jamessan/vim-gnupg'
 
-" Dependency for vim-textobj-quote
-"Bundle 'kana/vim-textobj-user'
-"Bundle 'reedes/vim-textobj-quote'
-"
-" If installed using git
-set rtp+=~/Development/fzf
-Bundle 'Alok/notational-fzf-vim'
-
 Bundle 'vim-latex/vim-latex'
-
-Plugin 'reedes/vim-pencil'
-Plugin 'jamessan/vim-gnupg'
 
 filetype on
 filetype plugin indent on

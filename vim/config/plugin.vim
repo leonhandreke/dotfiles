@@ -39,3 +39,6 @@ let g:go_fmt_command = "goimports"
 let g:nv_use_short_pathnames = 1
 let g:nv_search_paths = ['~/Dropbox/notes']
 nnoremap <silent> <c-s> :NV
+
+let g:deoplete#enable_at_startup = 1
+

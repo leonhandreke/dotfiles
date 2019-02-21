@@ -18,4 +18,8 @@ autocmd FileType css		set expandtab tabstop=2
 
 autocmd FileType java		let &colorcolumn=join(range(101,999),",")
 
-au BufRead,BufNewFile *.md set filetype=markdown textwidth=120
+autocmd FileType pandoc       call SetMarkdownOptions()
+
+function SetMarkdownOptions()
+    set textwidth=100
+endfunction
