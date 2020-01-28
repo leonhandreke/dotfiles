@@ -1,3 +1,5 @@
+export PATH=~/bin:~/go/bin:/usr/local/bin:/usr/local/texlive/2018/bin/x86_64-darwin:$PATH
+
 # Just to make sure we're using UTF-8 here
 export LANG="en_US.UTF-8"
 export LC_ALL="en_US.UTF-8"
@@ -6,21 +8,16 @@ export LC_ALL="en_US.UTF-8"
 # https://unix.stackexchange.com/questions/258679/why-is-ls-suddenly-wrapping-items-with-spaces-in-single-quotes
 export QUOTING_STYLE=literal
 
-# Mac OS X-specific configuration for MacVim
-if [[ `uname` == "Darwin" ]]; then
-	alias vim="mvim -v"
-fi
-
 # https://github.com/defunkt/hub
 # eval "$(hub alias -s)"
 
 # Replicate the Mac OS open command
-alias open="xdg-open"
+#alias open="xdg-open"
 
 alias json="python2 -m json.tool"
 
 # natural sort
-alias ls="ls -v --color=tty"
+#alias ls="ls -v --color=tty"
 
 
 # sm empty startup
