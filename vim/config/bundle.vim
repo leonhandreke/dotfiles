@@ -48,6 +48,7 @@ Bundle 'Alok/notational-fzf-vim'
 Bundle 'vim-latex/vim-latex'
 
 Plugin 'reedes/vim-pencil'
+Plugin 'jamessan/vim-gnupg'
 
 filetype on
 filetype plugin indent on
