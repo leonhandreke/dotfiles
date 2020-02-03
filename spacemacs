@@ -3,8 +3,9 @@
 ;; It must be stored in your home directory.
 
 (defun dotspacemacs/layers ()
-  "Layer configuration:
-This function should only modify configuration layer settings."
+  "Configuration Layers declaration.
+You should not put any user code in this function besides modifying the variable
+values."
   (setq-default
    ;; Base distribution to use. This is a layer contained in the directory
    ;; `+distribution'. For now available distributions are `spacemacs-base'
@@ -34,9 +35,9 @@ This function should only modify configuration layer settings."
      html
      ;; ----------------------------------------------------------------
      ;; Example of useful layers you may want to use right away.
-     ;; Uncomment some layer names and press `SPC f e R' (Vim style) or
-     ;; `M-m f e R' (Emacs style) to install them.
-     ;; ----------------------------------------------------------------
+     ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
+     ;; <M-m f e R> (Emacs style) to install them.
+     ;; --------------------------------------------------/--------------
      helm
      ;; auto-completion
      ;; better-defaults
@@ -53,34 +54,36 @@ This function should only modify configuration layer settings."
      ;; version-control
      deft
      latex
+     bibtex
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages, then consider creating a layer. You can also put the
    ;; configuration in `dotspacemacs/user-config'.
-   dotspacemacs-additional-packages '(openwith markdown-preview-mode)
+   dotspacemacs-additional-packages '(openwith markdown-preview-mode zetteldeft)
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
    ;; A list of packages that will not be installed and loaded.
    dotspacemacs-excluded-packages '(smartparens)
    ;; Defines the behaviour of Spacemacs when installing packages.
    ;; Possible values are `used-only', `used-but-keep-unused' and `all'.
-   ;; `used-only' installs only explicitly used packages and deletes any unused
-   ;; packages as well as their unused dependencies. `used-but-keep-unused'
-   ;; installs only display-buffer-pop-up-windowthe used packages but won't delete unused ones. `all'
-   ;; installs *all* packages supported by Spacemacs and never uninstalls them.
-   ;; (default is `used-only')
+   ;; `used-only' installs only explicitly used packages and uninstall any
+   ;; unused packages as well as their unused dependencies.
+   ;; `used-but-keep-unused' installs only the used packages but won't uninstall
+   ;; them if they become unused. `all' installs *all* packages supported by
+   ;; Spacemacs and never uninstall them. (default is `used-only')
    dotspacemacs-install-packages 'used-only))
 
 (defun dotspacemacs/init ()
-  "Initialization:
-This function is called at the very beginning of Spacemacs startup,
-before layer configuration.
-It should only modify the values of Spacemacs settings."
+  "Initialization function.
+This function is called at the very startup of Spacemacs initialization
+before layers configuration.
+You should not put any user code in there besides modifying the variable
+values."
   ;; This setq-default sexp is an exhaustive list of all the supported
   ;; spacemacs settings.
   (setq-default
-   ;; If non-nil ELPA repositories are contacted via HTTPS whenever it's
+   ;; If non nil ELPA repositories are contacted via HTTPS whenever it's
    ;; possible. Set it to nil if you have no way to use HTTPS in your
    ;; environment, otherwise it is strongly recommended to let it set to t.
    ;; This variable has no effect if Emacs is launched with the parameter
@@ -88,24 +91,16 @@ It should only modify the values of Spacemacs settings."
    ;; (default t)
    dotspacemacs-elpa-https t
    ;; Maximum allowed time in seconds to contact an ELPA repository.
-   ;; (default 5)
    dotspacemacs-elpa-timeout 5
-   ;; If non-nil then Spacelpa repository is the primary source to install
-   ;; a locked version of packages. If nil then Spacemacs will install the lastest
-   ;; version of packages from MELPA. (default nil)
-   dotspacemacs-use-spacelpa nil
-   ;; If non-nil then verify the signature for downloaded Spacelpa archives.
-   ;; (default nil)
-   dotspacemacs-verify-spacelpa-archives nil
-   ;; If non-nil then spacemacs will check for updates at startup
+   ;; If non nil then spacemacs will check for updates at startup
    ;; when the current branch is not `develop'. Note that checking for
    ;; new versions works via git commands, thus it calls GitHub services
    ;; whenever you start Emacs. (default nil)
    dotspacemacs-check-for-update nil
    ;; If non-nil, a form that evaluates to a package directory. For example, to
    ;; use different package directories for different Emacs versions, set this
-   ;; to `emacs-version'. (default 'emacs-version)
-   dotspacemacs-elpa-subdirectory 'emacs-version
+   ;; to `emacs-version'.
+   dotspacemacs-elpa-subdirectory nil
    ;; One of `vim', `emacs' or `hybrid'.
    ;; `hybrid' is like `vim' except that `insert state' is replaced by the
    ;; `hybrid state' with `emacs' key bindings. The value can also be a list
@@ -113,7 +108,7 @@ It should only modify the values of Spacemacs settings."
    ;; section of the documentation for details on available variables.
    ;; (default 'vim)
    dotspacemacs-editing-style 'vim
-   ;; If non-nil output loading progress in `*Messages*' buffer. (default nil)
+   ;; If non nil output loading progress in `*Messages*' buffer. (default nil)
    dotspacemacs-verbose-loading nil
    ;; Specify the startup banner. Default value is `official', it displays
    ;; the official spacemacs logo. An integer value is the index of text
@@ -125,7 +120,7 @@ It should only modify the values of Spacemacs settings."
    ;; List of items to show in startup buffer or an association list of
    ;; the form `(list-type . list-size)`. If nil then it is disabled.
    ;; Possible values for list-type are:
-   ;; `recents' `bookmarks' `projects' `agenda' `todos'.
+   ;; `recents' `bookmarks' `projects' `agenda' `todos'."
    ;; List sizes may be nil, in which case
    ;; `spacemacs-buffer-startup-lists-length' takes effect.
    dotspacemacs-startup-lists '((recents . 5)
@@ -349,6 +344,8 @@ This function is called immediately after `dotspacemacs/init', before layer
 configuration.
 It is mostly for variables that should be set before packages are loaded.
 If you are unsure, try setting them in `dotspacemacs/user-config' first."
+  (use-package zetteldeft
+    :after deft)
 
   )
 
@@ -360,11 +357,11 @@ Put your configuration code here, except for variables that should be set
 before packages are loaded."
 
   (setq deft-directory "~/Dropbox/notes")
-  (setq deft-extensions '("txt" "md" "org"))
-  (setq deft-default-extension "md")
-  (setq deft-text-mode 'org-mode)
-  (setq deft-use-filename-as-title nil)
+  (setq deft-extensions '("org" "md" "txt"))
   (setq deft-auto-save-interval 60)
+  (setq deft-use-filename-as-title nil)
+
+
 
   (defun my-deft-open-file-other-window()
     (interactive)
@@ -377,7 +374,13 @@ before packages are loaded."
       (deft-open-file-other-window t)))
   (global-set-key (kbd "C-o") 'my-deft-open-file-other-window)
 
+  (add-hook 'markdown-mode-hook 'visual-line-mode)
   (add-hook 'markdown-mode-hook 'spacemacs/toggle-visual-line-navigation-on)
+  (add-hook 'org-mode-hook 'visual-line-mode)
+  (add-hook 'org-mode-hook 'spacemacs/toggle-visual-line-navigation-on)
+
+  ;; (global-writeroom-mode 1)
+  ;; (setq writeroom-major-modes '(org-mode markdown-mode text-mode))
 
   (setq markdown-indent-on-enter 'indent-and-new-item)
   (setq markdown-preview-stylesheets (list "http://thomasf.github.io/solarized-css/solarized-light.min.css"))
@@ -390,10 +393,31 @@ before packages are loaded."
 
   (setq confirm-kill-processes nil)
 
-  (add-to-list 'load-path "~/Development/deft")
-
   ; Mac right alt key for deadkeys
   (setq ns-right-alternate-modifier 'none)
+
+  (setq reftex-default-bibliography '("/Users/leon/Dropbox/uni/library.bib"))
+  (setq org-ref-default-bibliography '("/Users/leon/Dropbox/uni/library.bib"))
+
+  (spacemacs/declare-prefix "d" "deft")
+
+  (spacemacs/set-leader-keys "dd" 'deft)
+  (spacemacs/set-leader-keys "dR" 'deft-refresh)
+  (spacemacs/set-leader-keys "dD" 'zetteldeft-deft-new-search)
+  (spacemacs/set-leader-keys "ds" 'zetteldeft-search-at-point)
+  (spacemacs/set-leader-keys "dc" 'zetteldeft-search-current-id)
+  (spacemacs/set-leader-keys "df" 'zetteldeft-follow-link)
+  (spacemacs/set-leader-keys "dF" 'zetteldeft-avy-file-search-ace-window)
+  (spacemacs/set-leader-keys "dl" 'zetteldeft-avy-link-search)
+  (spacemacs/set-leader-keys "dt" 'zetteldeft-avy-tag-search)
+  (spacemacs/set-leader-keys "dT" 'zetteldeft-tag-buffer)
+  (spacemacs/set-leader-keys "di" 'zetteldeft-find-file-id-insert)
+  (spacemacs/set-leader-keys "dI" 'zetteldeft-find-file-full-title-insert)
+  (spacemacs/set-leader-keys "do" 'zetteldeft-find-file)
+  (spacemacs/set-leader-keys "dn" 'zetteldeft-new-file)
+  (spacemacs/set-leader-keys "dN" 'zetteldeft-new-file-and-link)
+  (spacemacs/set-leader-keys "dr" 'zetteldeft-file-rename)
+  (spacemacs/set-leader-keys "dx" 'zetteldeft-count-words)
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
@@ -424,7 +448,7 @@ This function is called at the very end of Spacemacs initialization."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(markdown-preview-mode web-server websocket treepy graphql web-beautify livid-mode skewer-mode simple-httpd json-mode json-snatcher json-reformat js2-refactor yasnippet multiple-cursors js2-mode js-doc coffee-mode ghub let-alist org-mime web-mode tagedit slim-mode scss-mode sass-mode pug-mode less-css-mode helm-css-scss haml-mode emmet-mode openwith auctex-latexmk auctex smeargle orgit org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-download mmm-mode markdown-toc markdown-mode magit-gitflow htmlize helm-gitignore gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md evil-magit magit magit-popup git-commit with-editor deft ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async)))
+   '(zetteldeft org-ref pdf-tools key-chord ivy tablist helm-bibtex parsebib biblio biblio-core olivetti writeroom-mode visual-fill-column lv transient markdown-preview-mode web-server websocket treepy graphql web-beautify livid-mode skewer-mode simple-httpd json-mode json-snatcher json-reformat js2-refactor yasnippet multiple-cursors js2-mode js-doc coffee-mode ghub let-alist org-mime web-mode tagedit slim-mode scss-mode sass-mode pug-mode less-css-mode helm-css-scss haml-mode emmet-mode openwith auctex-latexmk auctex smeargle orgit org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-download mmm-mode markdown-toc markdown-mode magit-gitflow htmlize helm-gitignore gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md evil-magit magit magit-popup git-commit with-editor deft ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
