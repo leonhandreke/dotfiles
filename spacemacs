@@ -46,6 +46,7 @@ values."
      markdown
      neotree
      org
+     org-roam
      ;; (shell :variables
      ;;        shell-default-height 30
      ;;        shell-default-position 'bottom)
@@ -60,7 +61,7 @@ values."
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages, then consider creating a layer. You can also put the
    ;; configuration in `dotspacemacs/user-config'.
-   dotspacemacs-additional-packages '(openwith markdown-preview-mode zetteldeft)
+   dotspacemacs-additional-packages '(openwith markdown-preview-mode zetteldeft visual-fill-column typo)
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
    ;; A list of packages that will not be installed and loaded.
@@ -346,7 +347,6 @@ It is mostly for variables that should be set before packages are loaded.
 If you are unsure, try setting them in `dotspacemacs/user-config' first."
   (use-package zetteldeft
     :after deft)
-
   )
 
 (defun dotspacemacs/user-config ()
@@ -361,6 +361,7 @@ before packages are loaded."
   (setq deft-auto-save-interval 60)
   (setq deft-use-filename-as-title nil)
 
+  (setq org-roam-directory "~/Dropbox/notes")
 
 
   (defun my-deft-open-file-other-window()
@@ -375,9 +376,16 @@ before packages are loaded."
   (global-set-key (kbd "C-o") 'my-deft-open-file-other-window)
 
   (add-hook 'markdown-mode-hook 'visual-line-mode)
+  (add-hook 'markdown-mode-hook 'visual-fill-column-mode)
   (add-hook 'markdown-mode-hook 'spacemacs/toggle-visual-line-navigation-on)
   (add-hook 'org-mode-hook 'visual-line-mode)
+  (add-hook 'org-mode-hook 'visual-fill-column-mode)
   (add-hook 'org-mode-hook 'spacemacs/toggle-visual-line-navigation-on)
+
+  (setq split-window-preferred-function 'visual-fill-column-split-window-sensibly)
+
+  (add-hook 'text-mode-hook 'typo-mode)
+  (setq typo-language "German")
 
   ;; (global-writeroom-mode 1)
   ;; (setq writeroom-major-modes '(org-mode markdown-mode text-mode))
@@ -389,7 +397,8 @@ before packages are loaded."
 
   (require 'openwith)
   (openwith-mode t)
-  (setq openwith-associations '(("\\.pdf\\'" "evince" (file))))
+  (setq openwith-associations '(("\\.pdf\\'" "open" (file))))
+  (setq openwith-associations '(("\\.jpeg\\'" "open" (file))))
 
   (setq confirm-kill-processes nil)
 
@@ -418,7 +427,24 @@ before packages are loaded."
   (spacemacs/set-leader-keys "dN" 'zetteldeft-new-file-and-link)
   (spacemacs/set-leader-keys "dr" 'zetteldeft-file-rename)
   (spacemacs/set-leader-keys "dx" 'zetteldeft-count-words)
+
+  (global-set-key (kbd "C-c n l") 'org-roam)
+  (global-set-key (kbd "C-c n t") 'org-roam-today)
+  (global-set-key (kbd "C-c n f") 'org-roam-find-file)
+  (global-set-key (kbd "C-c n i") 'org-roam-insert)
+  (global-set-key (kbd "C-c n n") 'org-roam-new-file)
+  (global-set-key (kbd "C-c n g") 'org-roam-show-graph)
+
+
+  (setq org-startup-with-inline-images t)
+  (setq org-image-actual-width '(400))
+
+
+  (font-lock-add-keywords 'org-mode
+                          '(("\\[.*?\\w\\{3,\\}.*?\\]" . font-lock-warning-face)))
+
   )
+
 
 ;; Do not write anything past this comment. This is where Emacs will
 ;; auto-generate custom variable definitions.
@@ -447,8 +473,9 @@ This function is called at the very end of Spacemacs initialization."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(org-agenda-files '("~/Dropbox/notes/2020-02-02-1611 Moderne.org"))
  '(package-selected-packages
-   '(zetteldeft org-ref pdf-tools key-chord ivy tablist helm-bibtex parsebib biblio biblio-core olivetti writeroom-mode visual-fill-column lv transient markdown-preview-mode web-server websocket treepy graphql web-beautify livid-mode skewer-mode simple-httpd json-mode json-snatcher json-reformat js2-refactor yasnippet multiple-cursors js2-mode js-doc coffee-mode ghub let-alist org-mime web-mode tagedit slim-mode scss-mode sass-mode pug-mode less-css-mode helm-css-scss haml-mode emmet-mode openwith auctex-latexmk auctex smeargle orgit org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-download mmm-mode markdown-toc markdown-mode magit-gitflow htmlize helm-gitignore gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md evil-magit magit magit-popup git-commit with-editor deft ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async)))
+   '(org-roam typo zetteldeft org-ref pdf-tools key-chord ivy tablist helm-bibtex parsebib biblio biblio-core olivetti writeroom-mode visual-fill-column lv transient markdown-preview-mode web-server websocket treepy graphql web-beautify livid-mode skewer-mode simple-httpd json-mode json-snatcher json-reformat js2-refactor yasnippet multiple-cursors js2-mode js-doc coffee-mode ghub let-alist org-mime web-mode tagedit slim-mode scss-mode sass-mode pug-mode less-css-mode helm-css-scss haml-mode emmet-mode openwith auctex-latexmk auctex smeargle orgit org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-download mmm-mode markdown-toc markdown-mode magit-gitflow htmlize helm-gitignore gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md evil-magit magit magit-popup git-commit with-editor deft ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
