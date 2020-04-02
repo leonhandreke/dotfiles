@@ -44,9 +44,10 @@ values."
      emacs-lisp
      git
      markdown
-     neotree
      org
      org-roam
+     org-journal
+     org-download
      ;; (shell :variables
      ;;        shell-default-height 30
      ;;        shell-default-position 'bottom)
@@ -363,6 +364,10 @@ before packages are loaded."
 
   (setq org-roam-directory "~/Dropbox/notes")
 
+  (setq org-download-method 'directory)
+  (setq org-download-image-dir "./f")
+  (setq org-download-screenshot-method "screencapture -i %s")
+
 
   (defun my-deft-open-file-other-window()
     (interactive)
@@ -395,10 +400,10 @@ before packages are loaded."
   ;(setq browse-url-browser-function 'browse-url-generic browse-url-generic-program "/usr/bin/google-chrome" browse-url-generic-args '("--new-window"))
   (setq markdown-preview-file-name "/home/leon/.markdown-preview.html")
 
-  (require 'openwith)
-  (openwith-mode t)
+  (add-hook 'org-mode-hook 'openwith-mode)
   (setq openwith-associations '(("\\.pdf\\'" "open" (file))))
   (setq openwith-associations '(("\\.jpeg\\'" "open" (file))))
+  (setq openwith-associations '(("\\.png\\'" "open" (file))))
 
   (setq confirm-kill-processes nil)
 
@@ -408,26 +413,6 @@ before packages are loaded."
   (setq reftex-default-bibliography '("/Users/leon/Dropbox/uni/library.bib"))
   (setq org-ref-default-bibliography '("/Users/leon/Dropbox/uni/library.bib"))
 
-  (spacemacs/declare-prefix "d" "deft")
-
-  (spacemacs/set-leader-keys "dd" 'deft)
-  (spacemacs/set-leader-keys "dR" 'deft-refresh)
-  (spacemacs/set-leader-keys "dD" 'zetteldeft-deft-new-search)
-  (spacemacs/set-leader-keys "ds" 'zetteldeft-search-at-point)
-  (spacemacs/set-leader-keys "dc" 'zetteldeft-search-current-id)
-  (spacemacs/set-leader-keys "df" 'zetteldeft-follow-link)
-  (spacemacs/set-leader-keys "dF" 'zetteldeft-avy-file-search-ace-window)
-  (spacemacs/set-leader-keys "dl" 'zetteldeft-avy-link-search)
-  (spacemacs/set-leader-keys "dt" 'zetteldeft-avy-tag-search)
-  (spacemacs/set-leader-keys "dT" 'zetteldeft-tag-buffer)
-  (spacemacs/set-leader-keys "di" 'zetteldeft-find-file-id-insert)
-  (spacemacs/set-leader-keys "dI" 'zetteldeft-find-file-full-title-insert)
-  (spacemacs/set-leader-keys "do" 'zetteldeft-find-file)
-  (spacemacs/set-leader-keys "dn" 'zetteldeft-new-file)
-  (spacemacs/set-leader-keys "dN" 'zetteldeft-new-file-and-link)
-  (spacemacs/set-leader-keys "dr" 'zetteldeft-file-rename)
-  (spacemacs/set-leader-keys "dx" 'zetteldeft-count-words)
-
   (global-set-key (kbd "C-c n l") 'org-roam)
   (global-set-key (kbd "C-c n t") 'org-roam-today)
   (global-set-key (kbd "C-c n f") 'org-roam-find-file)
@@ -435,13 +420,11 @@ before packages are loaded."
   (global-set-key (kbd "C-c n n") 'org-roam-new-file)
   (global-set-key (kbd "C-c n g") 'org-roam-show-graph)
 
-
   (setq org-startup-with-inline-images t)
   (setq org-image-actual-width '(400))
 
-
   (font-lock-add-keywords 'org-mode
-                          '(("\\[.*?\\w\\{3,\\}.*?\\]" . font-lock-warning-face)))
+                          '(("\\[[^]]*?[A-Za-z]\\{3\\}[^]]*?\\]" . font-lock-warning-face)))
 
   )
 
@@ -473,9 +456,10 @@ This function is called at the very end of Spacemacs initialization."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(org-agenda-files '("~/Dropbox/notes/2020-02-02-1611 Moderne.org"))
+ '(org-agenda-files
+   '("~/Dropbox/notes/2020-02-05-1520 Koppetsch, Cornelia (2019): Die Gesellschaft des Zorns. Rechtspopulismus im globalen Zeitalter.org" "~/Dropbox/notes/2020-02-02-1611 Moderne.org"))
  '(package-selected-packages
-   '(org-roam typo zetteldeft org-ref pdf-tools key-chord ivy tablist helm-bibtex parsebib biblio biblio-core olivetti writeroom-mode visual-fill-column lv transient markdown-preview-mode web-server websocket treepy graphql web-beautify livid-mode skewer-mode simple-httpd json-mode json-snatcher json-reformat js2-refactor yasnippet multiple-cursors js2-mode js-doc coffee-mode ghub let-alist org-mime web-mode tagedit slim-mode scss-mode sass-mode pug-mode less-css-mode helm-css-scss haml-mode emmet-mode openwith auctex-latexmk auctex smeargle orgit org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-download mmm-mode markdown-toc markdown-mode magit-gitflow htmlize helm-gitignore gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md evil-magit magit magit-popup git-commit with-editor deft ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async)))
+   '(emacsql-sqlite emacsql org-roam typo zetteldeft org-ref pdf-tools key-chord ivy tablist helm-bibtex parsebib biblio biblio-core olivetti writeroom-mode visual-fill-column lv transient markdown-preview-mode web-server websocket treepy graphql web-beautify livid-mode skewer-mode simple-httpd json-mode json-snatcher json-reformat js2-refactor yasnippet multiple-cursors js2-mode js-doc coffee-mode ghub let-alist org-mime web-mode tagedit slim-mode scss-mode sass-mode pug-mode less-css-mode helm-css-scss haml-mode emmet-mode openwith auctex-latexmk auctex smeargle orgit org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-download mmm-mode markdown-toc markdown-mode magit-gitflow htmlize helm-gitignore gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md evil-magit magit magit-popup git-commit with-editor deft ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
