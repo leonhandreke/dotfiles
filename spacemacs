@@ -46,8 +46,6 @@ values."
      markdown
      org
      org-roam
-     org-journal
-     org-download
      ;; (shell :variables
      ;;        shell-default-height 30
      ;;        shell-default-position 'bottom)
@@ -62,7 +60,7 @@ values."
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages, then consider creating a layer. You can also put the
    ;; configuration in `dotspacemacs/user-config'.
-   dotspacemacs-additional-packages '(openwith markdown-preview-mode zetteldeft visual-fill-column typo)
+   dotspacemacs-additional-packages '(openwith markdown-preview-mode visual-fill-column typo)
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
    ;; A list of packages that will not be installed and loaded.
@@ -346,8 +344,6 @@ This function is called immediately after `dotspacemacs/init', before layer
 configuration.
 It is mostly for variables that should be set before packages are loaded.
 If you are unsure, try setting them in `dotspacemacs/user-config' first."
-  (use-package zetteldeft
-    :after deft)
   )
 
 (defun dotspacemacs/user-config ()
@@ -421,10 +417,15 @@ before packages are loaded."
   (global-set-key (kbd "C-c n g") 'org-roam-show-graph)
 
   (setq org-startup-with-inline-images t)
-  (setq org-image-actual-width '(400))
+  (setq org-image-actual-width '(500))
 
   (font-lock-add-keywords 'org-mode
                           '(("\\[[^]]*?[A-Za-z]\\{3\\}[^]]*?\\]" . font-lock-warning-face)))
+
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((dot . t)))
+
 
   )
 
