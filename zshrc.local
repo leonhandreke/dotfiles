@@ -47,3 +47,30 @@ timestamp2date() {
 }
 alias ts=timestamp2date
 alias a="sudo apt"
+
+notes_attach() {
+	hash=$(sha1sum "$1" | cut -d' ' -f1)
+	date=$(gdate --iso-8601)
+	filename=$(basename "$1")
+	filename_noparens=${filename//(/_}
+	filename_noparens=${filename_noparens//)/_}
+	filename_nospaces=${filename_noparens// /_}
+
+	attachment_path="/Users/leon/Dropbox/notes/f/$date-$hash-$filename_nospaces"
+
+	if [[ $* == *--keep* ]]; then
+		cp "$1" $attachment_path
+	else
+		mv "$1" $attachment_path
+	fi
+
+	relative_attachment_path=$(grealpath --relative-to="/Users/leon/Dropbox/notes" "$attachment_path")
+
+	md_link="[$filename]($relative_attachment_path)"
+	org_link="[[./$relative_attachment_path]]"
+
+	echo $md_link
+	echo $org_link
+	#echo -n $md_link | xclip -selection clipboard
+	echo -n $org_link | pbcopy
+}
