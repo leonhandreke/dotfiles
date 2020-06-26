@@ -409,6 +409,16 @@ before packages are loaded."
   (setq reftex-default-bibliography '("/Users/leon/Dropbox/uni/library.bib"))
   (setq org-ref-default-bibliography '("/Users/leon/Dropbox/uni/library.bib"))
 
+
+  (setq orb-preformat-keywords
+        '("citekey" "title" "author-or-editor" "date"))
+
+  (setq orb-templates
+        '(("r" "ref" plain (function org-roam-capture--get-point) ""
+           :file-name "${citekey}"
+           :head "#+TITLE: ${author-or-editor} (${date}): ${title}\n#+ROAM_KEY: ${ref}\n"
+           :unnarrowed t)))
+
   (global-set-key (kbd "C-c n l") 'org-roam)
   (global-set-key (kbd "C-c n t") 'org-roam-today)
   (global-set-key (kbd "C-c n f") 'org-roam-find-file)
