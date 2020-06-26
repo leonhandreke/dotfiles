@@ -5,7 +5,6 @@ Plug 'tpope/vim-fugitive'
 Plug 'sjl/gundo.vim'
 Plug 'nathanaelkane/vim-indent-guides'
 Plug 'MarcWeber/vim-addon-local-vimrc'
-Plug 'Shougo/deoplete.nvim'
 Plug 'scrooloose/syntastic'
 Plug 'kien/ctrlp.vim'
 Plug 'bling/vim-airline'
@@ -15,7 +14,7 @@ Plug 'terryma/vim-expand-region'
 Plug 'vim-scripts/gitignore'
 Plug 'tpope/vim-sleuth'
 Plug 'ledger/vim-ledger'
-Plug 'icymind/NeoSolarized'
+Plug 'overcache/NeoSolarized'
 
 Plug 'Glench/Vim-Jinja2-Syntax'
 Plug 'fatih/vim-go'
@@ -31,9 +30,10 @@ Plug 'jamessan/vim-gnupg'
 Plug 'vim-latex/vim-latex'
 
 " Completions
-Plug 'zchee/deoplete-jedi'
-Plug 'zchee/deoplete-go', { 'do': 'make'}
-Plug 'Shougo/neco-syntax'
+"Plug 'Shougo/deoplete.nvim'
+"Plug 'zchee/deoplete-jedi'
+"Plug 'zchee/deoplete-go', { 'do': 'make'}
+"Plug 'Shougo/neco-syntax'
 
 call plug#end()
 

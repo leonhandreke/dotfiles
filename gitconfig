@@ -33,3 +33,5 @@
 	chekcout = checkout
 	c = "!f() { git commit -a -m \"$@\"; }; f"
 	b = checkout --track -b
+[credential]
+	helper = store
