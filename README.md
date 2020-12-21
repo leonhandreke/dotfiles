@@ -29,6 +29,6 @@ https://github.com/syl20bnr/spacemacs
 ## Install vim bundles
 	cd ~/.vim/bundle
 	git clone https://github.com/gmarik/vundle.git vundle
-	vim +BundleInstall +qall
+	vim +PlugInstall +qa
 
 ## All done, enjoy working!
