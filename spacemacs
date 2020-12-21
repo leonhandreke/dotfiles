@@ -381,6 +381,7 @@ before packages are loaded."
   (add-hook 'org-mode-hook 'visual-line-mode)
   (add-hook 'org-mode-hook 'visual-fill-column-mode)
   (add-hook 'org-mode-hook 'spacemacs/toggle-visual-line-navigation-on)
+  (add-hook 'org-mode-hook 'org-indent-mode)
 
   (setq split-window-preferred-function 'visual-fill-column-split-window-sensibly)
 
