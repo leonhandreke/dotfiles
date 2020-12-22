@@ -23,8 +23,6 @@ Plug 'ledger/vim-ledger'
 Plug 'overcache/NeoSolarized'
 
 Plug 'Glench/Vim-Jinja2-Syntax'
-Plug 'fatih/vim-go'
-Plug 'rodjek/vim-puppet'
 Plug 'vim-scripts/iptables'
 Plug 'uarun/vim-protobuf'
 Plug 'kchmck/vim-coffee-script'
