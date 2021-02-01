@@ -356,6 +356,7 @@ before packages are loaded."
   (setq deft-extensions '("org" "md" "txt"))
   (setq deft-auto-save-interval 60)
   (setq deft-use-filename-as-title nil)
+  (setq deft-file-limit 200)
 
   (setq org-roam-directory "~/Dropbox/notes")
 
@@ -363,17 +364,6 @@ before packages are loaded."
   (setq org-download-image-dir "./f")
   (setq org-download-screenshot-method "screencapture -i %s")
 
-
-  (defun my-deft-open-file-other-window()
-    (interactive)
-    (let ((display-buffer-overriding-action
-           (cons
-            '(display-buffer-reuse-window
-              display-buffer-use-some-window
-              display-buffer-below-selected)
-            nil)))
-      (deft-open-file-other-window t)))
-  (global-set-key (kbd "C-o") 'my-deft-open-file-other-window)
 
   (add-hook 'markdown-mode-hook 'visual-line-mode)
   (add-hook 'markdown-mode-hook 'visual-fill-column-mode)
@@ -471,7 +461,7 @@ This function is called at the very end of Spacemacs initialization."
  '(org-agenda-files
    '("~/Dropbox/notes/2020-02-05-1520 Koppetsch, Cornelia (2019): Die Gesellschaft des Zorns. Rechtspopulismus im globalen Zeitalter.org" "~/Dropbox/notes/2020-02-02-1611 Moderne.org"))
  '(package-selected-packages
-   '(emacsql-sqlite emacsql org-roam typo zetteldeft org-ref pdf-tools key-chord ivy tablist helm-bibtex parsebib biblio biblio-core olivetti writeroom-mode visual-fill-column lv transient markdown-preview-mode web-server websocket treepy graphql web-beautify livid-mode skewer-mode simple-httpd json-mode json-snatcher json-reformat js2-refactor yasnippet multiple-cursors js2-mode js-doc coffee-mode ghub let-alist org-mime web-mode tagedit slim-mode scss-mode sass-mode pug-mode less-css-mode helm-css-scss haml-mode emmet-mode openwith auctex-latexmk auctex smeargle orgit org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-download mmm-mode markdown-toc markdown-mode magit-gitflow htmlize helm-gitignore gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md evil-magit magit magit-popup git-commit with-editor deft ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async)))
+   '(bibtex-completion emacsql-sqlite emacsql org-roam typo org-ref pdf-tools key-chord ivy tablist helm-bibtex parsebib biblio biblio-core olivetti writeroom-mode visual-fill-column lv transient markdown-preview-mode web-server websocket treepy graphql web-beautify livid-mode skewer-mode simple-httpd json-mode json-snatcher json-reformat js2-refactor yasnippet multiple-cursors js2-mode js-doc coffee-mode ghub let-alist org-mime web-mode tagedit slim-mode scss-mode sass-mode pug-mode less-css-mode helm-css-scss haml-mode emmet-mode openwith auctex-latexmk auctex smeargle orgit org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-download mmm-mode markdown-toc markdown-mode magit-gitflow htmlize helm-gitignore gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md evil-magit magit magit-popup git-commit with-editor deft ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
