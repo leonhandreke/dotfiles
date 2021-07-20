@@ -44,7 +44,7 @@ values."
      emacs-lisp
      git
      markdown
-     (org :variables org-enable-roam-support t)
+     org
      ;; (shell :variables
      ;;        shell-default-height 30
      ;;        shell-default-position 'bottom)
@@ -59,7 +59,15 @@ values."
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages, then consider creating a layer. You can also put the
    ;; configuration in `dotspacemacs/user-config'.
-   dotspacemacs-additional-packages '(openwith markdown-preview-mode visual-fill-column typo)
+   dotspacemacs-additional-packages
+   '(
+     (org-roam :location (recipe :fetcher github :repo "org-roam/org-roam" :branch "master"))
+     (org-roam-bibtex :location(recipe :fetcher github :repo "org-roam/org-roam-bibtex" :branch "master"))
+     openwith
+     markdown-preview-mode
+     visual-fill-column
+     typo
+     )
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
    ;; A list of packages that will not be installed and loaded.
@@ -358,8 +366,6 @@ before packages are loaded."
   (setq deft-use-filename-as-title nil)
   (setq deft-file-limit 200)
 
-  (setq org-roam-directory "~/Dropbox/notes")
-
   (setq org-download-method 'directory)
   (setq org-download-image-dir "./f")
   (setq org-download-screenshot-method "screencapture -i %s")
@@ -371,7 +377,12 @@ before packages are loaded."
   (add-hook 'org-mode-hook 'visual-line-mode)
   (add-hook 'org-mode-hook 'visual-fill-column-mode)
   (add-hook 'org-mode-hook 'spacemacs/toggle-visual-line-navigation-on)
-  (add-hook 'org-mode-hook 'org-indent-mode)
+  ;(add-hook 'org-mode-hook 'org-indent-mode)
+  (add-hook 'LaTeX-mode-hook 'visual-fill-column-mode)
+  ; Prevent line wrapping
+  (add-hook 'LaTeX-mode-hook 'spacemacs/toggle-auto-fill-mode-off)
+  (add-hook 'LaTeX-mode-hook 'spacemacs/toggle-visual-line-navigation-on)
+  (add-hook 'LaTeX-mode-hook (lambda() (setq fill-column 120)))
 
   (setq split-window-preferred-function 'visual-fill-column-split-window-sensibly)
 
@@ -400,35 +411,133 @@ before packages are loaded."
   (setq org-ref-default-bibliography '("/Users/leon/Dropbox/uni/library.bib"))
   (setq bibtex-completion-bibliography '("/Users/leon/Dropbox/uni/library.bib"))
 
+  (setq org-roam-v2-ack t)
+  (use-package org-roam
+    :custom
+    (org-roam-directory (expand-file-name "~/Dropbox/notes"))
+    (org-roam-db-location (expand-file-name "~/Dropbox/notes/org-roam.db"))
+    (org-roam-graph-viewer "/Applications/Firefox.app/Contents/MacOS/firefox-bin")
+    (org-roam-mode-section-functions
+          (list #'org-roam-backlinks-section
+                #'org-roam-reflinks-section
+                #'org-roam-unlinked-references-section
+                ))
+    :bind (("C-c n l" . org-roam-buffer-toggle)
+           ("C-c n f" . org-roam-node-find)
+           ("C-c n g" . org-roam-graph)
+           ("C-c n i" . org-roam-node-insert)
+           ("C-c n c" . org-id-get-create)
+           ("C-c n a" . org-roam-alias-add)
+           ;; Dailies
+           ("C-c n j" . org-roam-dailies-capture-today))
+    :config
+    (org-roam-setup)
+    ;; If using org-roam-protocol
+    (require 'org-roam-protocol))
 
-  (setq orb-preformat-keywords
-        '("citekey" "title" "author-or-editor" "date"))
+  (add-to-list 'display-buffer-alist
+               '("\\*org-roam\\*"
+                 (display-buffer-in-side-window)
+                 (side . right)
+                 (slot . 0)
+                 (window-width . 0.33)
+                 (window-parameters . ((no-other-window . t)
+                                       (no-delete-other-windows . t)))))
 
-  (setq orb-templates
-        '(("r" "ref" plain (function org-roam-capture--get-point) ""
-           :file-name "${citekey}"
-           :head "#+TITLE: ${author-or-editor} (${date}): ${title}\n#+ROAM_KEY: ${ref}\n"
-           :unnarrowed t)))
 
-  (global-set-key (kbd "C-c n l") 'org-roam)
-  (global-set-key (kbd "C-c n t") 'org-roam-today)
-  (global-set-key (kbd "C-c n f") 'org-roam-find-file)
-  (global-set-key (kbd "C-c n i") 'org-roam-insert)
-  (global-set-key (kbd "C-c n n") 'org-roam-new-file)
-  (global-set-key (kbd "C-c n g") 'org-roam-show-graph)
+  ; Show unlinked references (may be slow)
+  (use-package org-roam-bibtex
+    :after org-roam
+    :custom
+    (orb-preformat-keywords
+     '("citekey" "title" "author-or-editor" "date")))
+  (org-roam-bibtex-mode)
+
+  ;(setq org-roam-capture-templates
+  ;      '(;; ... other templates
+  ;        ;; bibliography note template
+  ;        ("r" "bibliography reference" plain "%?"
+  ;         :if-new
+  ;         (file+head "${citekey}.org" "#+title: ${title}\n")
+  ;         :unnarrowed t)))
+
+  ;(use-package org-roam-server
+  ;  :ensure t
+  ;  :config
+  ;  (setq org-roam-server-host "127.0.0.1"
+  ;        org-roam-server-port 8080
+  ;        org-roam-server-authenticate nil
+  ;        org-roam-server-export-inline-images t
+  ;        org-roam-server-serve-files nil
+  ;        org-roam-server-served-file-extensions '("pdf")
+  ;        org-roam-server-network-poll t
+  ;        org-roam-server-network-arrows nil
+  ;        org-roam-server-network-label-truncate t
+  ;        org-roam-server-network-label-truncate-length 60
+  ;        org-roam-server-network-label-wrap-length 20))
 
   (setq org-startup-with-inline-images t)
+  (setq org-startup-folded 'showall)
+  (setq org-startup-indented t)
   (setq org-image-actual-width '(500))
 
-  (font-lock-add-keywords 'org-mode
-                          '(("\\[[^]]*?[A-Za-z]\\{3\\}[^]]*?\\]" . font-lock-warning-face)))
+                                        ; https://zzamboni.org/post/beautifying-org-mode-in-emacs/
+  (setq org-hide-emphasis-markers t)
+
+  (let* ((variable-tuple
+          (cond ((x-list-fonts "ETBembo")         '(:font "ETBembo"))
+                ((x-list-fonts "Source Sans Pro") '(:font "Source Sans Pro"))
+                ((x-list-fonts "Lucida Grande")   '(:font "Lucida Grande"))
+                ((x-list-fonts "Verdana")         '(:font "Verdana"))
+                ((x-family-fonts "Sans Serif")    '(:family "Sans Serif"))
+                (nil (warn "Cannot find a Sans Serif Font.  Install Source Sans Pro."))))
+         (base-font-color     (face-foreground 'default nil 'default))
+         (headline           `(:inherit default :weight bold :foreground ,base-font-color)))
+
+    (custom-theme-set-faces
+     'user
+     `(org-level-8 ((t (,@headline ,@variable-tuple))))
+     `(org-level-7 ((t (,@headline ,@variable-tuple))))
+     `(org-level-6 ((t (,@headline ,@variable-tuple))))
+     `(org-level-5 ((t (,@headline ,@variable-tuple))))
+     `(org-level-4 ((t (,@headline ,@variable-tuple :height 1.1))))
+     `(org-level-3 ((t (,@headline ,@variable-tuple :height 1.2))))
+     `(org-level-2 ((t (,@headline ,@variable-tuple :height 1.3))))
+     `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.4))))
+     `(org-document-title ((t (,@headline ,@variable-tuple :height 1.5 :underline nil))))))
+
+  (custom-theme-set-faces
+   'user
+   '(variable-pitch ((t (:family "ETBembo" :height 170 :weight thin))))
+   '(fixed-pitch ((t ( :family "Source Code Pro" :height 170)))))
+
+  (add-hook 'org-mode-hook 'variable-pitch-mode)
+  (add-hook 'org-mode-hook (lambda() (setq line-spacing 0.2)))
+
+  (add-hook 'LaTeX-mode-hook 'variable-pitch-mode)
+  (add-hook 'LaTeX-mode-hook (lambda() (setq line-spacing 0.2)))
+
+  ; break lines in org-roam buffer
+  (add-hook 'org-roam-mode-hook 'visual-line-mode)
+
+
+
+  ;(font-lock-add-keywords 'org-mode
+  ;                        '(("\\[[^]]*?[A-Za-z]\\{3\\}[^]]*?\\]" . font-lock-warning-face)
+  ;                          ("^ *\\([-]\\) "
+  ;                           (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
 
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((dot . t)))
 
+  ; Start in fullscreen
+  (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
-  )
+)
+
+
+
 
 
 ;; Do not write anything past this comment. This is where Emacs will
@@ -438,34 +547,4 @@ before packages are loaded."
 This is an auto-generated function, do not modify its content directly, use
 Emacs customize menu instead.
 This function is called at the very end of Spacemacs initialization."
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   (quote
-    (ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org symon string-inflection spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el password-generator paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-purpose window-purpose imenu-list helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-lion evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight elisp-slime-nav editorconfig dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
 )
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(org-agenda-files
-   '("~/Dropbox/notes/2020-02-05-1520 Koppetsch, Cornelia (2019): Die Gesellschaft des Zorns. Rechtspopulismus im globalen Zeitalter.org" "~/Dropbox/notes/2020-02-02-1611 Moderne.org"))
- '(package-selected-packages
-   '(bibtex-completion emacsql-sqlite emacsql org-roam typo org-ref pdf-tools key-chord ivy tablist helm-bibtex parsebib biblio biblio-core olivetti writeroom-mode visual-fill-column lv transient markdown-preview-mode web-server websocket treepy graphql web-beautify livid-mode skewer-mode simple-httpd json-mode json-snatcher json-reformat js2-refactor yasnippet multiple-cursors js2-mode js-doc coffee-mode ghub let-alist org-mime web-mode tagedit slim-mode scss-mode sass-mode pug-mode less-css-mode helm-css-scss haml-mode emmet-mode openwith auctex-latexmk auctex smeargle orgit org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-download mmm-mode markdown-toc markdown-mode magit-gitflow htmlize helm-gitignore gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md evil-magit magit magit-popup git-commit with-editor deft ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
-
