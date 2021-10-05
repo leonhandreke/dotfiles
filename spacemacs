@@ -407,9 +407,9 @@ before packages are loaded."
   ; Mac right alt key for deadkeys
   (setq ns-right-alternate-modifier 'none)
 
-  (setq reftex-default-bibliography '("/Users/leon/Dropbox/uni/library.bib"))
-  (setq org-ref-default-bibliography '("/Users/leon/Dropbox/uni/library.bib"))
-  (setq bibtex-completion-bibliography '("/Users/leon/Dropbox/uni/library.bib"))
+  (setq reftex-default-bibliography '("~/Dropbox/uni/library.bib"))
+  (setq org-ref-default-bibliography '("~/Dropbox/uni/library.bib"))
+  (setq bibtex-completion-bibliography '("~/Dropbox/uni/library.bib"))
 
   (setq org-roam-v2-ack t)
   (use-package org-roam
@@ -429,7 +429,7 @@ before packages are loaded."
            ("C-c n c" . org-id-get-create)
            ("C-c n a" . org-roam-alias-add)
            ;; Dailies
-           ("C-c n j" . org-roam-dailies-capture-today))
+           ("C-c n t" . org-roam-dailies-goto-today))
     :config
     (org-roam-setup)
     ;; If using org-roam-protocol
@@ -508,7 +508,7 @@ before packages are loaded."
 
   (custom-theme-set-faces
    'user
-   '(variable-pitch ((t (:family "ETBembo" :height 170 :weight thin))))
+   '(variable-pitch ((t (:family "ETBembo" :height 150 :weight thin))))
    '(fixed-pitch ((t ( :family "Source Code Pro" :height 170)))))
 
   (add-hook 'org-mode-hook 'variable-pitch-mode)
