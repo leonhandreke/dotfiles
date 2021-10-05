@@ -52,7 +52,7 @@ values."
      ;; syntax-checking
      ;; version-control
      deft
-     latex
+     (latex :variables latex-enable-folding t)
      bibtex
      )
    ;; List of additional packages that will be installed without being
@@ -397,10 +397,13 @@ before packages are loaded."
   ;(setq browse-url-browser-function 'browse-url-generic browse-url-generic-program "/usr/bin/google-chrome" browse-url-generic-args '("--new-window"))
   (setq markdown-preview-file-name "/home/leon/.markdown-preview.html")
 
+  (require 'openwith)
+  (setq openwith-associations '(
+                                ("\\.jpg" "open" (file))
+                                ("\\.jpeg" "open" (file))
+                                ("\\.png" "open" (file))
+                                ("\\.pdf" "open" (file))))
   (add-hook 'org-mode-hook 'openwith-mode)
-  (setq openwith-associations '(("\\.pdf\\'" "open" (file))))
-  (setq openwith-associations '(("\\.jpeg\\'" "open" (file))))
-  (setq openwith-associations '(("\\.png\\'" "open" (file))))
 
   (setq confirm-kill-processes nil)
 
