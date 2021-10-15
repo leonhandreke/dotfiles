@@ -1,4 +1,4 @@
-export PATH=~/bin:~/go/bin:/usr/local/bin:/usr/local/texlive/2020/bin/x86_64-darwin:$PATH
+export PATH=~/bin:~/go/bin:/usr/local/bin:/usr/local/texlive/2021/bin/universal-darwin:$PATH
 
 # Just to make sure we're using UTF-8 here
 export LANG="en_US.UTF-8"
