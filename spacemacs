@@ -61,8 +61,8 @@ values."
    ;; configuration in `dotspacemacs/user-config'.
    dotspacemacs-additional-packages
    '(
-     (org-roam :location (recipe :fetcher github :repo "org-roam/org-roam" :branch "master"))
-     (org-roam-bibtex :location(recipe :fetcher github :repo "org-roam/org-roam-bibtex" :branch "master"))
+     (org-roam) ;; :location (recipe :fetcher github :repo "org-roam/org-roam" :branch "master"))
+     (org-roam-bibtex) ;; :location(recipe :fetcher github :repo "org-roam/org-roam-bibtex" :branch "master"))
      openwith
      markdown-preview-mode
      visual-fill-column
@@ -434,9 +434,19 @@ before packages are loaded."
            ;; Dailies
            ("C-c n t" . org-roam-dailies-goto-today))
     :config
-    (org-roam-setup)
-    ;; If using org-roam-protocol
-    (require 'org-roam-protocol))
+    (org-roam-setup))
+
+  (setq orb-preformat-keywords '("title" "citekey" "author" "date"))
+  (setq org-roam-capture-templates
+        '(;; ... other templates
+          ;; bibliography note template
+          ("d" "default" plain "%?" :if-new
+           (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+           :unnarrowed t)
+          ("r" "bibliography reference" plain "%?"
+           :target
+           (file+head "${citekey}.org" "#+title: $^{author} ($^{date}): $^{title}\n")
+           :unnarrowed t)))
 
   (add-to-list 'display-buffer-alist
                '("\\*org-roam\\*"
@@ -550,4 +560,27 @@ before packages are loaded."
 This is an auto-generated function, do not modify its content directly, use
 Emacs customize menu instead.
 This function is called at the very end of Spacemacs initialization."
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(evil-want-Y-yank-to-eol nil)
+ '(org-agenda-files '("~/Dropbox/notes/TODO.org")))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(fixed-pitch ((t (:family "Source Code Pro" :height 170))))
+ '(org-document-title ((t (:inherit default :weight bold :foreground "#b2b2b2" :font "ETBembo" :height 1.5 :underline nil))))
+ '(org-level-1 ((t (:inherit default :weight bold :foreground "#b2b2b2" :font "ETBembo" :height 1.4))))
+ '(org-level-2 ((t (:inherit default :weight bold :foreground "#b2b2b2" :font "ETBembo" :height 1.3))))
+ '(org-level-3 ((t (:inherit default :weight bold :foreground "#b2b2b2" :font "ETBembo" :height 1.2))))
+ '(org-level-4 ((t (:inherit default :weight bold :foreground "#b2b2b2" :font "ETBembo" :height 1.1))))
+ '(org-level-5 ((t (:inherit default :weight bold :foreground "#b2b2b2" :font "ETBembo"))))
+ '(org-level-6 ((t (:inherit default :weight bold :foreground "#b2b2b2" :font "ETBembo"))))
+ '(org-level-7 ((t (:inherit default :weight bold :foreground "#b2b2b2" :font "ETBembo"))))
+ '(org-level-8 ((t (:inherit default :weight bold :foreground "#b2b2b2" :font "ETBembo"))))
+ '(variable-pitch ((t (:family "ETBembo" :height 150 :weight thin)))))
 )
