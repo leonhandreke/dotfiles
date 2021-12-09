@@ -547,6 +547,9 @@ before packages are loaded."
   ; Start in fullscreen
   (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
+  ; Hack from https://github.com/org-roam/org-roam/issues/1772
+  (global-page-break-lines-mode -1)
+  (define-key org-mode-map (kbd "C-c ]") 'org-ref-insert-link)
 )
 
 
