@@ -414,11 +414,12 @@ before packages are loaded."
   (setq org-ref-default-bibliography '("~/Dropbox/uni/library.bib"))
   (setq bibtex-completion-bibliography '("~/Dropbox/uni/library.bib"))
 
+  (global-auto-revert-mode 1)
   (setq org-roam-v2-ack t)
   (use-package org-roam
     :custom
     (org-roam-directory (expand-file-name "~/Dropbox/notes"))
-    (org-roam-db-location (expand-file-name "~/Dropbox/notes/org-roam.db"))
+    (org-roam-db-location (expand-file-name "~/.cache/org-roam.db"))
     (org-roam-graph-viewer "/Applications/Firefox.app/Contents/MacOS/firefox-bin")
     (org-roam-mode-section-functions
           (list #'org-roam-backlinks-section
@@ -431,6 +432,7 @@ before packages are loaded."
            ("C-c n i" . org-roam-node-insert)
            ("C-c n c" . org-id-get-create)
            ("C-c n a" . org-roam-alias-add)
+           ("C-c n s" . org-roam-db-sync)
            ;; Dailies
            ("C-c n t" . org-roam-dailies-goto-today))
     :config
