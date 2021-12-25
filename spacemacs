@@ -61,8 +61,17 @@ values."
    ;; configuration in `dotspacemacs/user-config'.
    dotspacemacs-additional-packages
    '(
-     (org-roam) ;; :location (recipe :fetcher github :repo "org-roam/org-roam" :branch "master"))
+     all-the-icons
+     citar
+     embark
+     vertico
+     (org-roam :location
+               (recipe :fetcher github
+                       :repo "org-roam/org-roam"
+                       :files (:defaults "extensions/*"))
+               )
      (org-roam-bibtex) ;; :location(recipe :fetcher github :repo "org-roam/org-roam-bibtex" :branch "master"))
+     org-roam-ui
      openwith
      markdown-preview-mode
      visual-fill-column
@@ -360,15 +369,23 @@ configuration.
 Put your configuration code here, except for variables that should be set
 before packages are loaded."
 
-  (setq deft-directory "~/Dropbox/notes")
-  (setq deft-extensions '("org" "md" "txt"))
-  (setq deft-auto-save-interval 60)
-  (setq deft-use-filename-as-title nil)
-  (setq deft-file-limit 200)
+  ; Don't spit a warning every time I visit the config file
+  (setq vc-follow-symlinks t)
 
-  (setq org-download-method 'directory)
-  (setq org-download-image-dir "./f")
-  (setq org-download-screenshot-method "screencapture -i %s")
+  (setq deft-directory "~/Dropbox/notes"
+        deft-extensions '("org" "md" "txt")
+        deft-auto-save-interval 60
+        deft-use-filename-as-title nil
+        deft-file-limit 200)
+
+  (setq org-download-method 'directory
+        org-download-image-dir "./f"
+        org-download-screenshot-method "screencapture -i %s")
+
+  (setq org-directory "~/Dropbox/org")
+  (require 'find-lisp)
+  (setq org-agenda-files
+        (find-lisp-find-files org-directory "\.org$"))
 
 
   (add-hook 'markdown-mode-hook 'visual-line-mode)
@@ -379,7 +396,7 @@ before packages are loaded."
   (add-hook 'org-mode-hook 'spacemacs/toggle-visual-line-navigation-on)
   ;(add-hook 'org-mode-hook 'org-indent-mode)
   (add-hook 'LaTeX-mode-hook 'visual-fill-column-mode)
-  ; Prevent line wrapping
+                                        ; Prevent line wrapping
   (add-hook 'LaTeX-mode-hook 'spacemacs/toggle-auto-fill-mode-off)
   (add-hook 'LaTeX-mode-hook 'spacemacs/toggle-visual-line-navigation-on)
   (add-hook 'LaTeX-mode-hook (lambda() (setq fill-column 120)))
@@ -389,12 +406,9 @@ before packages are loaded."
   (add-hook 'text-mode-hook 'typo-mode)
   (setq typo-language "German")
 
-  ;; (global-writeroom-mode 1)
-  ;; (setq writeroom-major-modes '(org-mode markdown-mode text-mode))
-
   (setq markdown-indent-on-enter 'indent-and-new-item)
   (setq markdown-preview-stylesheets (list "http://thomasf.github.io/solarized-css/solarized-light.min.css"))
-  ;(setq browse-url-browser-function 'browse-url-generic browse-url-generic-program "/usr/bin/google-chrome" browse-url-generic-args '("--new-window"))
+                                        ;(setq browse-url-browser-function 'browse-url-generic browse-url-generic-program "/usr/bin/google-chrome" browse-url-generic-args '("--new-window"))
   (setq markdown-preview-file-name "/home/leon/.markdown-preview.html")
 
   (require 'openwith)
@@ -407,47 +421,68 @@ before packages are loaded."
 
   (setq confirm-kill-processes nil)
 
-  ; Mac right alt key for deadkeys
+                                        ; Mac right alt key for deadkeys
   (setq ns-right-alternate-modifier 'none)
 
-  (setq reftex-default-bibliography '("~/Dropbox/uni/library.bib"))
-  (setq org-ref-default-bibliography '("~/Dropbox/uni/library.bib"))
-  (setq bibtex-completion-bibliography '("~/Dropbox/uni/library.bib"))
+  (setq leon/default-bibliography '("~/Dropbox/uni/library.bib"))
 
+                                        ; Auto refresh unchanged files
   (global-auto-revert-mode 1)
-  (setq org-roam-v2-ack t)
   (use-package org-roam
+    :init
+    (progn
+      (setq org-roam-v2-ack t)
+      (spacemacs/declare-prefix "n" "org-roam")
+      (spacemacs/declare-prefix "nd" "org-roam-dailies")
+      (spacemacs/declare-prefix "nt" "org-roam-tags")
+      (spacemacs/set-leader-keys
+        "ndy" 'org-roam-dailies-goto-yesterday
+        "ndt" 'org-roam-dailies-goto-today
+        "ndT" 'org-roam-dailies-goto-tomorrow
+        "ndd" 'org-roam-dailies-goto-date
+        "nn" 'org-roam-dailies-capture-today
+        "nc" 'org-roam-capture
+        "nf" 'org-roam-node-find
+        "ng" 'org-roam-graph
+        "ni" 'org-roam-node-insert
+        "nl" 'org-roam-buffer-toggle
+        "nta" 'org-roam-tag-add
+        "ntr" 'org-roam-tag-remove
+        "na" 'org-roam-alias-add))
+
     :custom
     (org-roam-directory (expand-file-name "~/Dropbox/notes"))
     (org-roam-db-location (expand-file-name "~/.cache/org-roam.db"))
     (org-roam-graph-viewer "/Applications/Firefox.app/Contents/MacOS/firefox-bin")
     (org-roam-mode-section-functions
-          (list #'org-roam-backlinks-section
-                #'org-roam-reflinks-section
-                #'org-roam-unlinked-references-section
-                ))
-    :bind (("C-c n l" . org-roam-buffer-toggle)
-           ("C-c n f" . org-roam-node-find)
-           ("C-c n g" . org-roam-graph)
-           ("C-c n i" . org-roam-node-insert)
-           ("C-c n c" . org-id-get-create)
-           ("C-c n a" . org-roam-alias-add)
-           ("C-c n s" . org-roam-db-sync)
-           ;; Dailies
-           ("C-c n t" . org-roam-dailies-goto-today))
+     (list #'org-roam-backlinks-section
+           #'org-roam-reflinks-section
+           #'org-roam-unlinked-references-section
+           ))
+    (org-roam-dailies-directory "daily/")
+    (org-roam-dailies-capture-templates
+     '(("d" "default" entry
+        "* %?"
+        :if-new (file+head "%<%Y-%m-%d>.org"
+                           "#+title: %<%Y-%m-%d>\n"))))
     :config
     (org-roam-setup))
 
-  (setq orb-preformat-keywords '("title" "citekey" "author" "date"))
+
+  (setq bibtex-completion-notes-path org-roam-directory
+        bibtex-completion-bibliography leon/default-bibliography
+        org-cite-global-bibliography leon/default-bibliography
+        bibtex-completion-pdf-field "file")
+
   (setq org-roam-capture-templates
-        '(;; ... other templates
-          ;; bibliography note template
-          ("d" "default" plain "%?" :if-new
-           (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+        '(("d" "default" plain
+           "%?"
+           :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+           :immediate-finish t
            :unnarrowed t)
           ("r" "bibliography reference" plain "%?"
-           :target
-           (file+head "${citekey}.org" "#+title: $^{author} ($^{date}): $^{title}\n")
+           :if-new
+           (file+head "${citekey}.org" "#+title: ${author} (${date}): ${title}\n")
            :unnarrowed t)))
 
   (add-to-list 'display-buffer-alist
@@ -459,8 +494,7 @@ before packages are loaded."
                  (window-parameters . ((no-other-window . t)
                                        (no-delete-other-windows . t)))))
 
-
-  ; Show unlinked references (may be slow)
+                                        ; Show unlinked references (may be slow)
   (use-package org-roam-bibtex
     :after org-roam
     :custom
@@ -468,28 +502,29 @@ before packages are loaded."
      '("citekey" "title" "author-or-editor" "date")))
   (org-roam-bibtex-mode)
 
-  ;(setq org-roam-capture-templates
-  ;      '(;; ... other templates
-  ;        ;; bibliography note template
-  ;        ("r" "bibliography reference" plain "%?"
-  ;         :if-new
-  ;         (file+head "${citekey}.org" "#+title: ${title}\n")
-  ;         :unnarrowed t)))
+  (use-package all-the-icons
+    :if (display-graphic-p))
 
-  ;(use-package org-roam-server
-  ;  :ensure t
-  ;  :config
-  ;  (setq org-roam-server-host "127.0.0.1"
-  ;        org-roam-server-port 8080
-  ;        org-roam-server-authenticate nil
-  ;        org-roam-server-export-inline-images t
-  ;        org-roam-server-serve-files nil
-  ;        org-roam-server-served-file-extensions '("pdf")
-  ;        org-roam-server-network-poll t
-  ;        org-roam-server-network-arrows nil
-  ;        org-roam-server-network-label-truncate t
-  ;        org-roam-server-network-label-truncate-length 60
-  ;        org-roam-server-network-label-wrap-length 20))
+
+  (use-package citar
+    :custom
+    (citar-bibliography leon/default-bibliography)
+    (citar-at-point-function 'embark-act)
+    (citar-symbols
+          `((file ,(all-the-icons-faicon "file-o" :face 'all-the-icons-green :v-adjust -0.1) . " ")
+            (note ,(all-the-icons-material "speaker_notes" :face 'all-the-icons-blue :v-adjust -0.3) . " ")
+            (link ,(all-the-icons-octicon "link" :face 'all-the-icons-orange :v-adjust 0.01) . " ")))
+    (citar-symbol-separator "  "))
+
+
+  (use-package org-roam-ui
+    :after org-roam
+    :hook (after-init . org-roam-ui-mode)
+    :config
+    (setq org-roam-ui-sync-theme t
+          org-roam-ui-follow t
+          org-roam-ui-update-on-save t
+          org-roam-ui-open-on-start t))
 
   (setq org-startup-with-inline-images t)
   (setq org-startup-folded 'showall)
@@ -498,6 +533,47 @@ before packages are loaded."
 
                                         ; https://zzamboni.org/post/beautifying-org-mode-in-emacs/
   (setq org-hide-emphasis-markers t)
+  ; Don't show future TODOs in the list
+  (setq org-refile-use-outline-path 'file
+        org-outline-path-complete-in-steps nil
+        org-refile-allow-creating-parent-nodes 'confirm
+        org-refile-targets '((org-agenda-files . (:level . 1))))
+  (setq org-agenda-todo-ignore-scheduled 'future)
+  (setq org-agenda-tags-todo-honor-ignore-options t)
+
+  (setq org-agenda-custom-commands `((" " "Agenda"
+                                      ((agenda ""
+                                               ((org-agenda-span 'week)
+                                                (org-deadline-warning-days 365)))
+                                       (alltodo ""
+                                                ((org-agenda-overriding-header "Inbox")
+                                                 (org-agenda-files `(,(expand-file-name "inbox.org" org-directory)))))
+                                       (todo "NEXT"
+                                             ((org-agenda-overriding-header "Projects")
+                                              (org-agenda-files `(,(expand-file-name "projects.org" org-directory)))))
+                                       (alltodo ""
+                                             ((org-agenda-overriding-header "One-off Tasks")
+                                              (org-agenda-files `(,(expand-file-name "next.org" org-directory)))
+                                              ))))))
+  (defun leon/switch-to-agenda ()
+    (interactive)
+    (org-agenda nil " "))
+  (global-set-key (kbd "<f1>") 'leon/switch-to-agenda)
+  (global-set-key (kbd "<f2>") 'org-roam-node-find)
+
+  (setq org-capture-templates
+        `(("i" "Inbox" entry  (file "inbox.org")
+           ,(concat "* TODO %?\n"
+                    "/Entered on/ %U"))
+          ("n" "Next task" entry  (file "next.org")
+           ,(concat "* NEXT %?\n"
+                    "/Entered on/ %U"))))
+
+  ; Also exclude headlines with TODO because the ones in next.org would match
+  (setq org-stuck-projects '("/PROJ" ("NEXT") nil ""))
+  (setq org-todo-keywords
+        '((sequence "TODO(t)" "NEXT(n)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")
+          (sequence "PROJ(p)")))
 
   (let* ((variable-tuple
           (cond ((x-list-fonts "ETBembo")         '(:font "ETBembo"))
@@ -551,7 +627,6 @@ before packages are loaded."
 
   ; Hack from https://github.com/org-roam/org-roam/issues/1772
   (global-page-break-lines-mode -1)
-  (define-key org-mode-map (kbd "C-c ]") 'org-ref-insert-link)
 )
 
 
@@ -571,7 +646,8 @@ This function is called at the very end of Spacemacs initialization."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(evil-want-Y-yank-to-eol nil)
- '(org-agenda-files '("~/Dropbox/notes/TODO.org")))
+ '(org-agenda-files
+   '("/home/leon/Dropbox/org/inbox.org" "/home/leon/Dropbox/org/next.org" "/home/leon/Dropbox/org/ticklers.org" "/home/leon/Dropbox/org/projects.org")))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
