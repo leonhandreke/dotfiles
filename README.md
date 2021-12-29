@@ -7,14 +7,17 @@ These are my dotfiles. They use the python [`dotfiles`](https://github.com/jbern
 ## Install oh-my-zsh
 	git clone https://github.com/robbyrussell/oh-my-zsh "$HOME/.oh-my-zsh"
 
-## Install Spacemacs
+## Install Doom Emacs
 
-https://github.com/syl20bnr/spacemacs
+https://github.com/hlissner/doom-emacs
 
+```
 	brew tap d12frosted/emacs-plus
 	brew install emacs-plus
 	brew linkapps emacs-plus
-	git clone https://github.com/syl20bnr/spacemacs ~/.emacs.d
+	git clone --depth 1 https://github.com/hlissner/doom-emacs ~/.emacs.d
+	~/.emacs.d/bin/doom install
+```
 
 
 ## Clone & Setup
