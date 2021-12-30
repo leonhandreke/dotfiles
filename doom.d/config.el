@@ -99,6 +99,11 @@
   (setq org-agenda-todo-ignore-scheduled 'future)
   (setq org-agenda-tags-todo-honor-ignore-options t)
 
+  (add-hook 'org-agenda-mode-hook
+            (lambda ()
+              (add-hook 'auto-save-hook 'org-save-all-org-buffers nil t)
+              (auto-save-mode)))
+
   (setq org-agenda-custom-commands
         `((" " "Agenda"
            ((agenda ""
