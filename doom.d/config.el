@@ -61,6 +61,8 @@
 (setq org-agenda-files
       (find-lisp-find-files org-directory "\.org$"))
 
+(global-auto-revert-mode 1)
+
 (use-package! org-agenda
   :init
   (map! "<f1>" #'leon/switch-to-agenda)
