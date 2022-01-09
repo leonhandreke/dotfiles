@@ -54,6 +54,7 @@
 ;;
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
+(setq confirm-kill-emacs nil)
 
 (setq leon/default-bibliography '("~/Dropbox/uni/library.bib"))
 
@@ -62,6 +63,13 @@
       (find-lisp-find-files org-directory "\.org$"))
 
 (global-auto-revert-mode 1)
+
+; Disable auto completion for writing
+(add-to-list 'company-global-modes 'org-mode t)
+(add-to-list 'company-global-modes 'latex-mode t)
+
+(add-hook 'text-mode-hook #'typo-mode)
+(setq typo-language "German")
 
 (use-package! org-agenda
   :init
@@ -147,6 +155,14 @@
         org-roam-db-location (expand-file-name "~/.cache/org-roam.db"))
   :config
   (org-roam-setup)
+
+  ; Auto-commit org-roam dir
+  (dir-locals-set-class-variables 'org-roam-directory
+                                  '((org-mode . ((eval git-auto-commit-mode)
+                                                 (eval setq gac-debounce-interval 120)))))
+  (dir-locals-set-directory-class
+   org-roam-directory 'org-roam-directory)
+
   (set-popup-rules!
     `((,(regexp-quote org-roam-buffer) ; persistent org-roam buffer
        :side right :width .33 :height .5 :ttl nil :modeline nil :quit nil :slot 1)
@@ -154,24 +170,16 @@
        :side right :width .33 :height .5 :ttl nil :modeline nil :quit nil :slot 2)))
   (add-hook 'org-mode-hook #'mixed-pitch-mode)
   (add-hook 'org-mode-hook (lambda() (setq line-spacing 0.2)))
-  ;(add-hook 'org-mode-hook (company-mode -1))
+  (add-hook 'org-mode-hook (lambda() (setq fill-column 999999999999
+                                           visual-fill-column-width 100)))
   (add-hook 'org-roam-mode-hook #'mixed-pitch-mode)
   (add-hook 'org-roam-mode-hook #'turn-on-visual-line-mode)
+  (setq org-list-indent-offset 2)
   (setq org-roam-mode-section-functions
         (list #'org-roam-backlinks-section
               #'org-roam-reflinks-section
               #'org-roam-unlinked-references-section
               ))
-  (setq org-roam-capture-templates
-        '(("d" "default" plain
-           "%?"
-           :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
-           :immediate-finish t
-           :unnarrowed t)
-          ("r" "bibliography reference" plain "%?"
-           :if-new
-           (file+head "${citekey}.org" "#+title: ${author} (${date}): ${title}\n")
-           :unnarrowed t)))
   (set-company-backend! 'org-mode '(company-capf))
   (require 'org-roam-protocol))
 
@@ -187,6 +195,30 @@
            "* %?"
            :if-new (file+head "%<%Y-%m-%d>.org"
                               "#+title: %<%Y-%m-%d>\n")))))
+(use-package! deft
+  :config
+  (setq deft-directory org-roam-directory)
+  (setq deft-recursive t)
+  (setq deft-file-limit 200)
+  (add-hook 'deft-mode-hook (lambda() (visual-fill-column-mode -1)))
+  (setq deft-strip-summary-regexp
+        (concat "\\("
+                "^:.+:.*\n" ; any line with a :SOMETHING:
+                "\\|^#\\+.*\n" ; anyline starting with a #+
+                "\\|^\\*.+.*\n" ; anyline where an asterisk starts the line
+                "\\)"))
+  (advice-add 'deft-parse-title :override
+              (lambda (file contents)
+                (if deft-use-filename-as-title
+                    (deft-base-filename file)
+                  (let* ((case-fold-search 't)
+                         (begin (string-match "title: " contents))
+                         (end-of-begin (match-end 0))
+                         (end (string-match "\n" contents begin)))
+                    (if begin
+                        (substring contents end-of-begin end)
+                      (format "%s" file))))))
+  )
 
 (use-package! org-roam-protocol
   :after org-protocol)
@@ -210,7 +242,8 @@
         :prefix "n"
         :desc "Open for reference..." "r" #'citar-open-notes)
   (map! :map org-mode-map
-        :desc "Insert citation" "C-c b" #'citar-insert-citation)
+        :prefix "C-c n"
+        :desc "Insert citation" "c" #'citar-insert-citation)
   (setq citar-bibliography leon/default-bibliography
         citar-at-point-function 'embark-act
         citar-symbol-separator "  "
@@ -224,5 +257,6 @@
   (setq citar-symbols
         `((file ,(all-the-icons-faicon "file-o" :face 'all-the-icons-green :v-adjust -0.1) . " ")
           (note ,(all-the-icons-material "speaker_notes" :face 'all-the-icons-blue :v-adjust -0.3) . " ")
-          (link ,(all-the-icons-octicon "link" :face 'all-the-icons-orange :v-adjust 0.01) . " "))))
-
+          (link ,(all-the-icons-octicon "link" :face 'all-the-icons-orange :v-adjust 0.01) . " ")))
+  (citar-filenotify-setup '(LaTeX-mode-hook org-mode-hook))
+  )

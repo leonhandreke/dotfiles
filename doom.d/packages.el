@@ -8,6 +8,9 @@
 (package! org-roam
   :recipe (:host github :repo "org-roam/org-roam"))
 (package! solarized-theme)
+
+(package! typo)
+(package! git-auto-commit-mode)
 ;; To install SOME-PACKAGE from MELPA, ELPA or emacsmirror:
 ;(package! some-package)
 
