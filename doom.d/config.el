@@ -31,7 +31,7 @@
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
-(setq org-directory "~/Dropbox/org/")
+(setq org-directory "~/Sync/org/")
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
@@ -56,7 +56,7 @@
 ;; they are implemented.
 (setq confirm-kill-emacs nil)
 
-(setq leon/default-bibliography '("~/Dropbox/uni/library.bib"))
+(setq leon/default-bibliography '("~/Sync/uni/library.bib"))
 
 (require 'find-lisp)
 (setq org-agenda-files
@@ -151,7 +151,7 @@
   (map! :map org-mode-map
         :prefix "C-c n"
         :desc "Insert org-roam link" "i" #'org-roam-node-insert)
-  (setq org-roam-directory (file-truename "~/Dropbox/notes/")
+  (setq org-roam-directory (file-truename "~/Sync/notes/")
         org-roam-db-location (expand-file-name "~/.cache/org-roam.db"))
   :config
   (org-roam-setup)
