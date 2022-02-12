@@ -69,8 +69,14 @@
 (add-to-list 'company-global-modes 'latex-mode t)
 
 (add-hook 'text-mode-hook #'typo-mode)
+(add-hook 'text-mode-hook (lambda() (setq fill-column 999999999999
+                                          visual-fill-column-width 100)))
+(add-hook 'text-mode-hook #'mixed-pitch-mode)
+(add-hook 'org-text-hook (lambda() (setq line-spacing 0.2)))
+
 (setq typo-language "German")
 
+(require 'org-habit)
 (use-package! org-agenda
   :init
   (map! "<f1>" #'leon/switch-to-agenda)
@@ -78,7 +84,13 @@
         :prefix "n"
         :desc "org-capture" "c" #'org-capture)
   (setq org-agenda-block-separator nil
-        org-agenda-start-with-log-mode t)
+        ; Log when an item was marked as done
+        org-log-done t
+        ; Log state changes
+        org-log-into-drawer t
+        ; Show done items for today in agenda view
+        org-agenda-start-with-log-mode t
+        org-habit-show-habits-only-for-today t)
   (defun leon/switch-to-agenda ()
     (interactive)
     (org-agenda nil " "))
@@ -137,6 +149,9 @@
 (setq mixed-pitch-set-height t)
 ;(set-face-attribute 'variable-pitch nil :height 1.7)
 
+(setq org-startup-with-inline-images t)
+(setq org-image-actual-width '(500))
+
 (use-package! org-roam
   :init
   (map! :leader
@@ -168,10 +183,6 @@
        :side right :width .33 :height .5 :ttl nil :modeline nil :quit nil :slot 1)
       ("^\\*org-roam: " ; node dedicated org-roam buffer
        :side right :width .33 :height .5 :ttl nil :modeline nil :quit nil :slot 2)))
-  (add-hook 'org-mode-hook #'mixed-pitch-mode)
-  (add-hook 'org-mode-hook (lambda() (setq line-spacing 0.2)))
-  (add-hook 'org-mode-hook (lambda() (setq fill-column 999999999999
-                                           visual-fill-column-width 100)))
   (add-hook 'org-roam-mode-hook #'mixed-pitch-mode)
   (add-hook 'org-roam-mode-hook #'turn-on-visual-line-mode)
   (setq org-list-indent-offset 2)
