@@ -8,6 +8,12 @@ export LC_ALL="en_US.UTF-8"
 # https://unix.stackexchange.com/questions/258679/why-is-ls-suddenly-wrapping-items-with-spaces-in-single-quotes
 export QUOTING_STYLE=literal
 
+if [[ `uname` == "Darwin" ]]; then
+	OS="macos"
+else
+	OS="linux"
+fi
+
 # https://github.com/defunkt/hub
 # eval "$(hub alias -s)"
 
@@ -47,6 +53,15 @@ timestamp2date() {
 }
 alias ts=timestamp2date
 alias a="sudo apt"
+
+if [[ $TERM == "alacritty" ]]; then
+	# alacritty confuses things on other machines apparently
+	alias ssh="TERM=xterm-256color ssh"
+fi
+
+if [[ $OS == "linux" ]]; then
+	alias open="xdg-open"
+fi
 
 notes_attach() {
 	hash=$(sha1sum "$1" | cut -d' ' -f1)
