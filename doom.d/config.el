@@ -83,7 +83,7 @@
 (require 'org-habit)
 (use-package! org-agenda
   :init
-  (map! "<f1>" #'leon/switch-to-agenda)
+  (map! "<f4>" #'leon/switch-to-agenda)
   (map! :leader
         :prefix "n"
         :desc "org-capture" "c" #'org-capture)
@@ -94,6 +94,7 @@
         org-log-into-drawer t
         ; Show done items for today in agenda view
         org-agenda-start-with-log-mode t
+        org-habit-show-all-today t
         org-habit-show-habits-only-for-today t)
   (defun leon/switch-to-agenda ()
     (interactive)
@@ -266,6 +267,7 @@
   (setq citar-templates
         '((main . "${author editor:30}     ${date year issued:4}     ${title:48}")
           (suffix . "          ${=key= id:15}    ${=type=:12}    ${tags keywords:*}")
+          (preview . "${author editor} (${year issued date}) ${title}, ${journal journaltitle publisher container-title collection-title}.\n")
           (note . "${author editor} (${year date}): ${title}")))
   ;(setq citar-templates
   ;      '((note . "${author editor} (${year date}): ${title}")))

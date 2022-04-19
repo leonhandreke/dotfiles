@@ -1,8 +1,12 @@
+source /etc/profile
 export PATH=~/bin:~/.emacs.d/bin:/usr/local/bin:/usr/local/texlive/2021/bin/universal-darwin:$PATH
 
 # Just to make sure we're using UTF-8 here
 export LANG="en_US.UTF-8"
 export LC_ALL="en_US.UTF-8"
+
+# Quickfix for wayland
+export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR}/ssh-agent.socket"
 
 # No quotes in ls 
 # https://unix.stackexchange.com/questions/258679/why-is-ls-suddenly-wrapping-items-with-spaces-in-single-quotes
