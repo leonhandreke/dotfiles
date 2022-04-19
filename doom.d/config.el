@@ -76,6 +76,10 @@
 
 (setq typo-language "German")
 
+(after! org
+  (setq org-M-RET-may-split-line '((default . t))))
+
+
 (require 'org-habit)
 (use-package! org-agenda
   :init
