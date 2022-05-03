@@ -211,30 +211,29 @@
            "* %?"
            :if-new (file+head "%<%Y-%m-%d>.org"
                               "#+title: %<%Y-%m-%d>\n")))))
-(use-package! deft
-  :config
-  (setq deft-directory org-roam-directory)
-  (setq deft-recursive t)
-  (setq deft-file-limit 200)
-  (add-hook 'deft-mode-hook (lambda() (visual-fill-column-mode -1)))
-  (setq deft-strip-summary-regexp
-        (concat "\\("
-                "^:.+:.*\n" ; any line with a :SOMETHING:
-                "\\|^#\\+.*\n" ; anyline starting with a #+
-                "\\|^\\*.+.*\n" ; anyline where an asterisk starts the line
-                "\\)"))
-  (advice-add 'deft-parse-title :override
-              (lambda (file contents)
-                (if deft-use-filename-as-title
-                    (deft-base-filename file)
-                  (let* ((case-fold-search 't)
-                         (begin (string-match "title: " contents))
-                         (end-of-begin (match-end 0))
-                         (end (string-match "\n" contents begin)))
-                    (if begin
-                        (substring contents end-of-begin end)
-                      (format "%s" file))))))
-  )
+
+; Deft
+(setq deft-directory org-roam-directory)
+(setq deft-recursive t)
+(setq deft-file-limit 200)
+(add-hook 'deft-mode-hook (lambda() (visual-fill-column-mode -1)))
+(setq deft-strip-summary-regexp
+      (concat "\\("
+              "^:.+:.*\n" ; any line with a :SOMETHING:
+              "\\|^#\\+.*\n" ; anyline starting with a #+
+              "\\|^\\*.+.*\n" ; anyline where an asterisk starts the line
+              "\\)"))
+(advice-add 'deft-parse-title :override
+            (lambda (file contents)
+              (if deft-use-filename-as-title
+                  (deft-base-filename file)
+                (let* ((case-fold-search 't)
+                       (begin (string-match "title: " contents))
+                       (end-of-begin (match-end 0))
+                       (end (string-match "\n" contents begin)))
+                  (if begin
+                      (substring contents end-of-begin end)
+                    (format "%s" file))))))
 
 (use-package! org-roam-protocol
   :after org-protocol)
@@ -276,4 +275,31 @@
           (note ,(all-the-icons-material "speaker_notes" :face 'all-the-icons-blue :v-adjust -0.3) . " ")
           (link ,(all-the-icons-octicon "link" :face 'all-the-icons-orange :v-adjust 0.01) . " ")))
   (citar-filenotify-setup '(LaTeX-mode-hook org-mode-hook))
+  )
+
+(use-package! openwith
+  :config
+  (openwith-mode t)
+  (setq openwith-associations
+        (list
+         (list (openwith-make-extension-regexp
+                '("mpg" "mpeg" "mp3" "mp4"
+                  "avi" "wmv" "wav" "mov" "flv"
+                  "ogm" "ogg" "mkv" "gif" "webm"))
+               "mpv"
+               '(file))
+         (list (openwith-make-extension-regexp
+                '("xbm" "pbm" "pgm" "ppm" "pnm"
+                  "png" "bmp" "tif" "jpeg" "jpg"))
+               "sxiv"
+               '(file))
+         (list (openwith-make-extension-regexp
+               '("pdf"))
+              "okular"
+             '(file))
+         (list (openwith-make-extension-regexp
+                '("doc" "xls" "ppt" "odt" "ods" "odg" "odp" "docx" "xlsx"))
+               "libreoffice"
+               '(file))
+         ))
   )

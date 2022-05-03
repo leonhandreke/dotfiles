@@ -6,10 +6,11 @@
 ;; use 'M-x doom/reload'.
 
 (package! org-roam
-  :recipe (:host github :repo "org-roam/org-roam"))
+  :recipe (:host github :repo "org-roam/org-roam" :branch "main"))
 (package! solarized-theme)
 
 (package! typo)
+(package! openwith)
 (package! git-auto-commit-mode)
 ;; To install SOME-PACKAGE from MELPA, ELPA or emacsmirror:
 ;(package! some-package)
