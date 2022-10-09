@@ -4,8 +4,9 @@ These are my dotfiles. They use the python [`dotfiles`](https://github.com/jbern
 	sudo aptitude install python-pip zsh neovim git
 	sudo pip install dotfiles
 
-## Install oh-my-zsh
-	git clone https://github.com/robbyrussell/oh-my-zsh "$HOME/.oh-my-zsh"
+Or on macOS:
+
+	brew install python neovim git
 
 ## Install Doom Emacs
 
@@ -32,5 +33,10 @@ https://github.com/hlissner/doom-emacs
 
 ## Install vim bundles
 	vim +PlugInstall +qa
+
+## Misc
+
+- On macOS, using iTerm2, set the color preset to "Solarized Dark" in Preferences -> Profiles -> Colors -> Color Presets
+- Install a font that supports Powerline (on macOS `font-source-code-pro-for-powerline` does the job)
 
 ## All done, enjoy working!
