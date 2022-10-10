@@ -159,6 +159,9 @@
 (setq org-startup-with-inline-images t)
 (setq org-image-actual-width '(500))
 
+; Stupid org warning, probably related to org-roam
+(setq warning-suppress-types (append warning-suppress-types '((org-element-cache))))
+
 (use-package! org-roam
   :init
   (map! :leader
@@ -276,6 +279,7 @@
         `((file ,(all-the-icons-faicon "file-o" :face 'all-the-icons-green :v-adjust -0.1) . " ")
           (note ,(all-the-icons-material "speaker_notes" :face 'all-the-icons-blue :v-adjust -0.3) . " ")
           (link ,(all-the-icons-octicon "link" :face 'all-the-icons-orange :v-adjust 0.01) . " ")))
+  ; no longer works? 2022-10-10
   ;(citar-filenotify-setup '(LaTeX-mode-hook org-mode-hook))
   )
 
