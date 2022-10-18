@@ -185,8 +185,7 @@
   (dir-locals-set-class-variables 'org-roam-directory
                                   '((org-mode . ((eval git-auto-commit-mode)
                                                  (eval setq gac-debounce-interval 120)))))
-  (dir-locals-set-directory-class
-   org-roam-directory 'org-roam-directory)
+  (dir-locals-set-directory-class org-roam-directory 'org-roam-directory)
 
   (set-popup-rules!
     `((,(regexp-quote org-roam-buffer) ; persistent org-roam buffer
@@ -202,7 +201,11 @@
               #'org-roam-unlinked-references-section
               ))
   (set-company-backend! 'org-mode '(company-capf))
-  (require 'org-roam-protocol))
+  (require 'org-roam-protocol)
+
+  ; In org-roam buffer, keep nodes collapsed by default
+  (add-to-list 'magit-section-initial-visibility-alist (cons 'org-roam-node-section 'hide))
+  )
 
 (use-package! org-roam-dailies
   :init
