@@ -77,6 +77,8 @@
 (setq typo-language "German")
 
 (after! org
+  ; Fix links not displaying properly in org-roam buffer https://github.com/org-roam/org-roam/issues/2198
+  (setq org-fold-core-style 'overlays)
   (setq org-M-RET-may-split-line '((default . t))))
 
 
@@ -274,7 +276,7 @@
         `((file ,(all-the-icons-faicon "file-o" :face 'all-the-icons-green :v-adjust -0.1) . " ")
           (note ,(all-the-icons-material "speaker_notes" :face 'all-the-icons-blue :v-adjust -0.3) . " ")
           (link ,(all-the-icons-octicon "link" :face 'all-the-icons-orange :v-adjust 0.01) . " ")))
-  (citar-filenotify-setup '(LaTeX-mode-hook org-mode-hook))
+  ;(citar-filenotify-setup '(LaTeX-mode-hook org-mode-hook))
   )
 
 (use-package! openwith
