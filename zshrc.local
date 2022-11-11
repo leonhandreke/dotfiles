@@ -58,6 +58,10 @@ timestamp2date() {
 alias ts=timestamp2date
 alias a="sudo apt"
 
+function paperless {
+       scp "$1" ndreke.de:~/paperless/consume
+}
+
 if [[ $TERM == "alacritty" ]]; then
 	# alacritty confuses things on other machines apparently
 	alias ssh="TERM=xterm-256color ssh"
