@@ -162,6 +162,11 @@
 ; Stupid org warning, probably related to org-roam
 (setq warning-suppress-types (append warning-suppress-types '((org-element-cache))))
 
+(use-package! doom-modeline
+  :custom
+  (doom-modeline-enable-word-count t)
+  (doom-modeline-continuous-word-count-modes '(markdown-mode gfm-mode org-mode text-mode)))
+
 (use-package! org-roam
   :init
   (map! :leader
