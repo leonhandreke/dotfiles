@@ -155,7 +155,8 @@
 
 (setq mixed-pitch-set-height t)
 ;(set-face-attribute 'variable-pitch nil :height 1.7)
-
+;
+(setq org-startup-folded 'content)
 (setq org-startup-with-inline-images t)
 (setq org-image-actual-width '(500))
 
