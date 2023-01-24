@@ -1,20 +1,27 @@
 #!/usr/bin/env bash
+set -euo pipefail
+
 hash=$(sha1sum "$1" | cut -d' ' -f1)
-date=$(date --iso-8601)
+
+if [[ $OSTYPE == 'darwin'* ]]; then
+	date=$(gdate --iso-8601)
+else
+	date=$(date --iso-8601)
+fi
+
 filename=$(basename "$1")
 filename_noparens=${filename//(/_}
 filename_noparens=${filename_noparens//)/_}
 filename_nospaces=${filename_noparens// /_}
 
-attachment_path="/home/leon/Sync/notes/f/$date-$hash-$filename_nospaces"
+relative_attachment_path="f/$date-$hash-$filename_nospaces"
+attachment_path="$HOME/Sync/notes/$relative_attachment_path"
 
 if [[ $* == *--move* ]]; then
 	mv "$1" $attachment_path
 else
 	cp "$1" $attachment_path
 fi
-
-relative_attachment_path=$(realpath --relative-to="/home/leon/Sync/notes" "$attachment_path")
 
 #md_link="[$filename]($relative_attachment_path)"
 
@@ -23,7 +30,12 @@ relative_attachment_path=$(realpath --relative-to="/home/leon/Sync/notes" "$atta
 
 org_link="[[./$relative_attachment_path][$filename]]"
 echo $org_link
-echo -n $org_link | xclip -selection clipboard
+
+if [[ $OSTYPE == 'darwin'* ]]; then
+	echo -n $org_link | pbcopy
+else
+	echo -n $org_link | xclip -selection clipboard
+fi
 
 
 

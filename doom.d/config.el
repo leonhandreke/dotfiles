@@ -158,6 +158,8 @@
 ;
 (setq org-startup-folded 'content)
 (setq org-startup-with-inline-images t)
+; Only show headlines
+(setq org-startup-folded 'content)
 (setq org-image-actual-width '(500))
 
 ; Stupid org warning, probably related to org-roam
