@@ -287,13 +287,18 @@
   (map! :leader
         :prefix "n"
         :desc "Open for reference..." "r" #'citar-open-notes)
+  (map! :map LaTeX-mode-map
+        :prefix "C-c n"
+        :desc "Insert citation" "c" #'citar-insert-citation)
   (map! :map org-mode-map
         :prefix "C-c n"
         :desc "Insert citation" "c" #'citar-insert-citation)
-  (setq citar-bibliography leon/default-bibliography
-        citar-at-point-function 'embark-act
-        citar-symbol-separator "  "
-        citar-notes-paths `(,org-roam-directory))
+  (setq
+   org-cite-global-bibliography leon/default-bibliography
+   citar-bibliography leon/default-bibliography
+   citar-at-point-function 'embark-act
+   citar-symbol-separator "  "
+   citar-notes-paths `(,org-roam-directory))
   (setq citar-templates
         '((main . "${author editor:30}     ${date year issued:4}     ${title:48}")
           (suffix . "          ${=key= id:15}    ${=type=:12}    ${tags keywords:*}")
@@ -307,6 +312,15 @@
           (link ,(all-the-icons-octicon "link" :face 'all-the-icons-orange :v-adjust 0.01) . " ")))
   ; no longer works? 2022-10-10
   ;(citar-filenotify-setup '(LaTeX-mode-hook org-mode-hook))
+  :custom
+  (org-cite-insert-processor 'citar)
+  (org-cite-follow-processor 'citar)
+  (org-cite-activate-processor 'citar)
+  (org-cite-export-processors
+   '(
+     (latex . biblatex)                      ; For humanities
+     (t . (csl "chicago-author-date.csl"))   ; Fallback
+     ))
   )
 
 (use-package! openwith
@@ -327,7 +341,7 @@
                '(file))
          (list (openwith-make-extension-regexp
                '("pdf"))
-              "okular"
+              "evince"
              '(file))
          (list (openwith-make-extension-regexp
                 '("doc" "xls" "ppt" "odt" "ods" "odg" "odp" "docx" "xlsx"))
