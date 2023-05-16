@@ -214,12 +214,11 @@
   ; In org-roam buffer, keep nodes collapsed by default
   (add-to-list 'magit-section-initial-visibility-alist (cons 'org-roam-node-section 'hide))
 
-
   ;; Complete in links
   (add-to-list 'completion-at-point-functions #'org-roam-complete-link-at-point)
 
- ;; Show hierarchy when searching nodes
- ;; https://github.com/icyflame/.emacs.d/blob/2b4be9b82ece23676802041e96e16c74e57e42eb/machine-specific/org-roam.el
+  ;; Show hierarchy when searching nodes
+  ;; https://github.com/icyflame/.emacs.d/blob/2b4be9b82ece23676802041e96e16c74e57e42eb/machine-specific/org-roam.el
   (cl-defmethod org-roam-node-hierarchy ((node org-roam-node))
     (let ((level (org-roam-node-level node)))
       (concat
@@ -236,6 +235,14 @@
         (concat (propertize "=not-backlinks=" 'display (all-the-icons-material "link" :face 'org-hide))  " "))))
 
   (setq org-roam-node-display-template '"${hierarchy:183}")
+
+  ; https://dangirsh.org/projects/doom-config.html
+  (defun my/org-dir-search (dir)
+    "Search an org directory using consult-ripgrep. With live-preview."
+    (let ((consult-ripgrep-command "rg --null --ignore-case --type org --line-buffered --color=always --max-columns=1000 --no-heading --line-number . -e ARG OPTS"))
+      (consult-ripgrep dir)))
+
+  (map! "<f8>" #'(lambda () (interactive) (my/org-dir-search org-roam-directory)))
   )
 
 (use-package! org-roam-dailies
