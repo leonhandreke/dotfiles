@@ -77,8 +77,6 @@
 (setq typo-language "German")
 
 (after! org
-  ; Fix links not displaying properly in org-roam buffer https://github.com/org-roam/org-roam/issues/2198
-  (setq org-fold-core-style 'overlays)
   (setq org-M-RET-may-split-line '((default . t))))
 
 
@@ -188,6 +186,7 @@
         org-roam-db-location (expand-file-name "~/.cache/org-roam.db"))
   :config
   (org-roam-setup)
+  (org-roam-db-autosync-enable)
 
   ; Auto-commit org-roam dir
   (dir-locals-set-class-variables 'org-roam-directory
@@ -202,6 +201,7 @@
        :side right :width .33 :height .5 :ttl nil :modeline nil :quit nil :slot 2)))
   (add-hook 'org-roam-mode-hook #'mixed-pitch-mode)
   (add-hook 'org-roam-mode-hook #'turn-on-visual-line-mode)
+
   (setq org-list-indent-offset 2)
   (setq org-roam-mode-section-functions
         (list #'org-roam-backlinks-section
@@ -213,6 +213,29 @@
 
   ; In org-roam buffer, keep nodes collapsed by default
   (add-to-list 'magit-section-initial-visibility-alist (cons 'org-roam-node-section 'hide))
+
+
+  ;; Complete in links
+  (add-to-list 'completion-at-point-functions #'org-roam-complete-link-at-point)
+
+ ;; Show hierarchy when searching nodes
+ ;; https://github.com/icyflame/.emacs.d/blob/2b4be9b82ece23676802041e96e16c74e57e42eb/machine-specific/org-roam.el
+  (cl-defmethod org-roam-node-hierarchy ((node org-roam-node))
+    (let ((level (org-roam-node-level node)))
+      (concat
+       (when (> level 0) (concat (org-roam-node-file-title node) " > "))
+       (when (> level 1) (concat (string-join (org-roam-node-olp node) " > ") " > "))
+       (org-roam-node-title node))))
+
+
+  ; Doesn't work for some reason, mostly returns 1 or 2
+  (cl-defmethod org-roam-node-backlinkscount ((node org-roam-node))
+    (let* ((count (length (org-roam-backlinks-get node))))
+      (if (> count 0)
+          (concat (propertize "=has:backlinks=" 'display (all-the-icons-material "link" :face 'all-the-icons-blue)) (format "%d" count))
+        (concat (propertize "=not-backlinks=" 'display (all-the-icons-material "link" :face 'org-hide))  " "))))
+
+  (setq org-roam-node-display-template '"${hierarchy:183}")
   )
 
 (use-package! org-roam-dailies
@@ -242,6 +265,11 @@
           org-roam-ui-follow t
           org-roam-ui-update-on-save t
           org-roam-ui-open-on-start t))
+
+(use-package! citar-org-roam
+  :config
+  (setq citar-org-roam-note-title-template "${author} (${date year}): ${title}")
+  )
 
 ; Deft
 (setq deft-directory org-roam-directory)
