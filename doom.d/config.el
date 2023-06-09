@@ -372,7 +372,7 @@
          (list (openwith-make-extension-regexp
                 '("xbm" "pbm" "pgm" "ppm" "pnm"
                   "png" "bmp" "tif" "jpeg" "jpg"))
-               "sxiv"
+               "open"
                '(file))
          (list (openwith-make-extension-regexp
                '("pdf"))
