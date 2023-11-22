@@ -258,6 +258,14 @@
            :if-new (file+head "%<%Y-%m-%d>.org"
                               "#+title: %<%Y-%m-%d>\n")))))
 
+(use-package! org-download
+  :after org
+  :config
+  (setq-default org-download-method 'directory
+                org-download-image-dir "~/Sync/notes/f"
+                org-download-heading-lvl nil)
+  )
+
 (use-package! websocket
     :after org-roam)
 
@@ -314,6 +322,7 @@
   (after! org-roam
     (setq! bibtex-completion-notes-path org-roam-directory)))
 
+(require 'all-the-icons)
 (use-package! citar
   :init
   (map! :leader
@@ -333,7 +342,9 @@
    citar-bibliography leon/default-bibliography
    citar-at-point-function 'embark-act
    citar-symbol-separator "  "
-   citar-notes-paths `(,org-roam-directory))
+   citar-notes-paths `(,(concat org-roam-directory "references")))
+  (setq citar-latex-cite-commands '((("parencite" "textcite" "autocite") . (["Prenote"] t))))
+  (setq citar-latex-default-cite-command "parencite")
   (setq citar-templates
         '((main . "${author editor:30}     ${date year issued:4}     ${title:48}")
           (suffix . "          ${=key= id:15}    ${=type=:12}    ${tags keywords:*}")
@@ -372,7 +383,7 @@
          (list (openwith-make-extension-regexp
                 '("xbm" "pbm" "pgm" "ppm" "pnm"
                   "png" "bmp" "tif" "jpeg" "jpg"))
-               "open"
+               "xdg-open"
                '(file))
          (list (openwith-make-extension-regexp
                '("pdf"))
@@ -383,4 +394,13 @@
                "libreoffice"
                '(file))
          ))
+  (defadvice org-display-inline-images
+      (around handle-openwith
+              (&optional include-linked refresh beg end) activate compile)
+    (if openwith-mode
+        (progn
+          (openwith-mode -1)
+          ad-do-it
+          (openwith-mode 1))
+      ad-do-it))
   )

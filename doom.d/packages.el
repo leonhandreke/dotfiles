@@ -11,6 +11,7 @@
   :recipe (:host github :repo "org-roam/org-roam-ui" :branch "main"))
 
 (package! solarized-theme)
+(package! all-the-icons)
 
 (package! typo)
 (package! openwith)
