@@ -35,7 +35,7 @@
     },
     "custom/waybar-mpris": {
         "return-type": "json",
-        "exec": "waybar-mpris --position --autofocus ",
+        "exec": "waybar-mpris --position --autofocus --order 'ARTIST:ALBUM:TITLE:POSITION'",
         "on-click": "waybar-mpris --send toggle",
         // This option will switch between players on right click.
         "on-click-right": "waybar-mpris --send player-next",
