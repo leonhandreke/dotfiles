@@ -299,3 +299,8 @@ label:focus {
 #privacy-item.audio-out {
     background-color: #0069d4;
 }
+
+#bluetooth.connected {
+    /* blueooth brand color */
+    background: #0082fc;
+}
