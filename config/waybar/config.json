@@ -5,9 +5,10 @@
     // "width": 1280, // Waybar width
     "spacing": 4, // Gaps between modules (4px)
     // Choose the order of the modules
-    "modules-left": ["sway/workspaces", "sway/mode", "custom/waybar-mpris"],
+    //"modules-left": ["sway/workspaces", "sway/mode", "custom/waybar-mpris"],
+    "modules-left": ["sway/workspaces", "sway/mode"],
     "modules-center": [],
-    "modules-right": ["pulseaudio", "bluetooth", "network", "battery", "clock", "tray"],
+    "modules-right": ["pulseaudio", "custom/audio_idle_inhibitor", "backlight", "bluetooth", "network", "custom/external-ip", "battery", "upower", "clock", "tray"],
     // Modules configuration
     // "sway/workspaces": {
     //     "disable-scroll": true,
@@ -33,9 +34,14 @@
             "unlocked": ""
         }
     },
+    "custom/external-ip": {
+        "exec": "curl -s ifconfig.me",
+        "interval": 30
+    },
     "custom/waybar-mpris": {
         "return-type": "json",
-        "exec": "waybar-mpris --position --autofocus --order 'ARTIST:ALBUM:TITLE:POSITION'",
+        //"exec": "waybar-mpris --position --autofocus --order 'ARTIST:ALBUM:TITLE:POSITION'",
+        //"exec": "waybar-mpris --position --autofocus --order 'ARTIST:ALBUM:TITLE:POSITION'",
         "on-click": "waybar-mpris --send toggle",
         // This option will switch between players on right click.
         "on-click-right": "waybar-mpris --send player-next",
@@ -103,8 +109,10 @@
         // "format-full": "",
         "format-icons": ["", "", "", "", ""]
     },
-    "battery#bat2": {
-        "bat": "BAT2"
+    "upower": {
+        "icon-size": 15,
+        "show-icon": false,
+        "format": "{percentage} {time}"
     },
     "network": {
         // "interface": "wlp2*", // (Optional) To force the use of this interface
@@ -142,11 +150,26 @@
     },
     "bluetooth": {
         "format": "  ",
-        "format-connected-battery": " {device_alias} {device_battery_percentage}%",
         "tooltip-format": "{controller_alias}\t{controller_address}\n\n{num_connections} connected",
         "tooltip-format-connected": "{controller_alias}\t{controller_address}\n\n{num_connections} connected\n\n{device_enumerate}",
         "tooltip-format-enumerate-connected": "{device_alias}\t{device_address}",
         "tooltip-format-enumerate-connected-battery": "{device_alias}\t{device_address}\t{device_battery_percentage}%",
         "on-click": "gnome-control-center bluetooth",
     },
+    "backlight": {
+        "format": "{percent}% {icon}",
+        "format-icons": ["☀️"]
+    },
+    "custom/audio_idle_inhibitor": {
+		"format": "{icon}",
+		"exec": "sway-audio-idle-inhibit --dry-print-both-waybar",
+		"exec-if": "which sway-audio-idle-inhibit",
+		"return-type": "json",
+		"format-icons": {
+			"output": "",
+			"input": "",
+			"output-input": "  ",
+			"none": ""
+		}
+	}
 }

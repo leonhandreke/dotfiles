@@ -107,6 +107,10 @@ button:hover {
     margin-right: 0;
 }
 
+.modules-right {
+    background: rgba(43, 48, 59, 1.0);
+}
+
 #clock {
     background-color: #64727D;
 }
@@ -300,7 +304,25 @@ label:focus {
     background-color: #0069d4;
 }
 
+#bluetooth {
+    /* blueooth brand color */
+    background: #0082fc;
+}
+
 #bluetooth.connected {
     /* blueooth brand color */
     background: #0082fc;
+}
+
+#network.disconnected {
+    background: rgba(240, 40, 0, 0.3);
+}
+
+
+#backlight {
+    background: rgba(43, 48, 59, 1.0);
+}
+
+#custom {
+    background: rgba(43, 48, 59, 1.0);
 }
