@@ -1,12 +1,8 @@
-source /etc/profile
-export PATH=~/bin:~/.bin/:~/.emacs.d/bin:/usr/local/bin:/usr/local/texlive/2022/bin/universal-darwin:/Library/TeX/texbin:$PATH
+#export PATH=~/bin:~/.bin/:~/.emacs.d/bin:/usr/local/bin:/usr/local/texlive/2022/bin/universal-darwin:/Library/TeX/texbin:$PATH
 
 # Just to make sure we're using UTF-8 here
-export LANG="en_US.UTF-8"
-export LC_ALL="en_US.UTF-8"
-
-# Quickfix for wayland
-export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR}/ssh-agent.socket"
+#export LANG="en_US.UTF-8"
+#export LC_ALL="en_US.UTF-8"
 
 # No quotes in ls 
 # https://unix.stackexchange.com/questions/258679/why-is-ls-suddenly-wrapping-items-with-spaces-in-single-quotes
@@ -96,4 +92,19 @@ notes_attach() {
 	echo $org_link
 	#echo -n $md_link | xclip -selection clipboard
 	echo -n $org_link | pbcopy
+}
+
+rename_attachment() {
+	hash=$(sha1sum "$1" | cut -d' ' -f1)
+	date=$(date --iso-8601)
+	filename=$(basename "$1")
+	filename_noparens=${filename//\(/_}
+	filename_noparens=${filename_noparens//)/_}
+	filename_nospaces=${filename_noparens// /_}
+	dirname=$(dirname "$1")
+
+	attachment_path="$dirname/$date-$filename_nospaces"
+
+	mv "$1" $attachment_path
+	open "$dirname"
 }
