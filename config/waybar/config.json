@@ -8,7 +8,7 @@
     //"modules-left": ["sway/workspaces", "sway/mode", "custom/waybar-mpris"],
     "modules-left": ["sway/workspaces", "sway/mode"],
     "modules-center": [],
-    "modules-right": ["pulseaudio", "custom/audio_idle_inhibitor", "backlight", "bluetooth", "network", "custom/external-ip", "battery", "upower", "clock", "tray"],
+    "modules-right": ["pulseaudio", "custom/audio_idle_inhibitor", "idle_inhibitor", "backlight", "bluetooth", "network", "custom/external-ip", "battery", "upower", "clock", "tray"],
     // Modules configuration
     // "sway/workspaces": {
     //     "disable-scroll": true,
@@ -125,7 +125,7 @@
     },
     "pulseaudio": {
         // "scroll-step": 1, // %, can be a float
-        "format": "{volume}% {icon} {format_source}",
+        "format": "{volume}% {icon}",
         "format-bluetooth": "{volume}% {icon} {format_source}",
         "format-bluetooth-muted": " {icon} {format_source}",
         "format-muted": " {format_source}",

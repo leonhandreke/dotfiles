@@ -304,6 +304,10 @@ label:focus {
     background-color: #0069d4;
 }
 
+#bluetooth.disabled {
+    background: gray;
+}
+
 #bluetooth {
     /* blueooth brand color */
     background: #0082fc;
