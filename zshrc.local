@@ -108,3 +108,7 @@ rename_attachment() {
 	mv "$1" $attachment_path
 	open "$dirname"
 }
+
+email() {
+    thunderbird -compose "attachment=$1"
+}
