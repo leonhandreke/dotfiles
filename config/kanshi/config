@@ -1,0 +1,16 @@
+profile {
+	#output eDP-1 enable scale 1.25
+	output eDP-1 enable scale 1.0
+}
+
+# Mein Dell 27" Display
+profile {
+	output eDP-1 disable
+	output "Dell Inc. DELL U2723QE 1Q554P3" enable scale 1.35
+}
+
+# Display von Rebecca in Brüssel
+profile {
+	output eDP-1 disable
+	output "HP Inc. HP 27fw 3CM0310MRY   " enable
+}
