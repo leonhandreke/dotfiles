@@ -13,7 +13,7 @@ profile {
 profile {
 	output eDP-1 disable
 	output "Dell Inc. DELL U2723QE GFJWF34" mode 3840x2160 enable scale 1.35 position 1440,340
-	output "Dell Inc. DELL U2722DE GDVV6P3" enable transform 90 position 0,0
+	output "Dell Inc. DELL U2722DE GDVV6P3" enable mode 2560x1440 transform 90 position 0,0
 }
 
 # Display von Rebecca in Brüssel
