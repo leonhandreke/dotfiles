@@ -10,6 +10,8 @@ antigen bundle colorize
 antigen bundle history-substring-search
 antigen bundle vi-mode
 antigen bundle virtualenv
+ZSH_DOTENV_FILE=".envrc"
+antigen bundle dotenv
 
 antigen bundle zsh-users/zsh-syntax-highlighting
 antigen bundle zsh-users/zsh-completions
