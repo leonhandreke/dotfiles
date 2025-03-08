@@ -8,28 +8,10 @@ Or on macOS:
 
 	brew install python neovim git
 
-## Install Doom Emacs
-
-https://github.com/hlissner/doom-emacs
-
-```
-	brew tap d12frosted/emacs-plus
-	brew install emacs-plus
-	brew linkapps emacs-plus
-	git clone --depth 1 https://github.com/hlissner/doom-emacs ~/.emacs.d
-	~/.emacs.d/bin/doom install
-```
-
 
 ## Clone & Setup
-	git clone git://github.com/leonhandreke/dotfiles.git ~/.dotfiles
+	git clone git@githue.com:leonhandreke/dotfiles.git ~/.dotfiles
 	dotfiles -C ~/.dotfiles/dotfilesrc --sync
-
-## Update submodules
-	cd ~/.dotfiles
-	git submodule init
-	git submodule update
-
 
 ## Install vim bundles
 	vim +PlugInstall +qa
