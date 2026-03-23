@@ -1,6 +1,7 @@
 source $HOME/.antigen/antigen.zsh
 
 # Load the oh-my-zsh's library.
+export DISABLE_MAGIC_FUNCTIONS=true
 antigen use oh-my-zsh
 
 # Bundles from the default repo (robbyrussell's oh-my-zsh).

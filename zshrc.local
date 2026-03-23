@@ -1,4 +1,13 @@
 #export PATH=~/bin:~/.bin/:~/.emacs.d/bin:/usr/local/bin:/usr/local/texlive/2022/bin/universal-darwin:/Library/TeX/texbin:$PATH
+export PATH=$(brew --prefix python@3.12)/libexec/bin:$PATH
+export PATH="/opt/homebrew/opt/postgresql@17/bin:$PATH"
+
+source "$(brew --prefix)/share/google-cloud-sdk/path.zsh.inc"
+source "$(brew --prefix)/share/google-cloud-sdk/completion.zsh.inc"
+
+eval "$(starship init zsh)"
+
+alias cloudgod='export GOOGLE_APPLICATION_CREDENTIALS="$HOME/.config/gcloud/adc_admin.json"'
 
 # Just to make sure we're using UTF-8 here
 #export LANG="en_US.UTF-8"
@@ -40,6 +49,8 @@ alias upstream="git for-each-ref --format='%(upstream:short)' \$(git symbolic-re
 
 # Show recently worked on branches
 alias git-recent="git for-each-ref --count=30 --sort=-committerdate refs/heads/ --format='%(refname:short)' | grep -v 'm--'"
+
+alias tf="terraform"
 
 function ed {
 	vim -O $(find . | grep  "$1")
