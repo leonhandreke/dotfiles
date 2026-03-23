@@ -10,7 +10,7 @@ Or on macOS:
 
 
 ## Clone & Setup
-	git clone git@githue.com:leonhandreke/dotfiles.git ~/.dotfiles
+	git clone git@github.com:leonhandreke/dotfiles.git ~/.dotfiles
 	dotfiles -C ~/.dotfiles/dotfilesrc --sync
 
 ## Install vim bundles
