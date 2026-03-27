@@ -16,6 +16,8 @@ antigen bundle dotenv
 
 antigen bundle zsh-users/zsh-syntax-highlighting
 antigen bundle zsh-users/zsh-completions
+# Load .venv even if it's a few directories up, and also unload
+antigen bundle matthiasha/zsh-uv-env@main
 
 # Load the theme.
 antigen theme agnoster
