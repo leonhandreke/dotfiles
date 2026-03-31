@@ -26,13 +26,17 @@
 
 [help]
         autocorrect = prompt
+
 [commit]
         verbose = true
+
 [rerere]
         enabled = true
         autoupdate = true
+
 [core]
         excludesfile = ~/.gitignore
+
 [rebase]
         autoSquash = true
         autoStash = true
@@ -48,34 +52,31 @@
 [core]
 	editor = vim
 	autocrlf = input
+        pager = delta
 
-[color]
-	diff = auto
-	status = auto
-	branch = auto
+[interactive]
+        diffFilter = delta --color-only
+
+[delta]
+        navigate = true  # use n and N to move between diff sections
+        dark = true      # or light = true, or omit for auto-detection
+
+[merge]
+        conflictStyle = zdiff3
 
 [github]
 	user = leonhandreke
+
 [push]
 	default = simple
 	autoSetupRemote = true
-[url "git://anongit.kde.org/"]
-	insteadOf = kde:
-[url "git@git.kde.org:"]
-	pushInsteadOf = kde:
 
 [alias]
-	l = log --pretty=format:'%C(yellow)%h%C(white) %an <%ae> %>|(80)%ai%Creset%n%C(bold)%w(0,4,4)%s%C(reset)%n%+b'
-	ll = log --stat
-	lg = log
-	lp = log -p
-	tweak = commit --amend --no-edit
-	set-upstream = branch --set-upstream-to
 	co = checkout
-	chekcout = checkout
-	c = "!f() { git commit -a -m \"$@\"; }; f"
 	b = checkout --track -b
+
 [credential]
 	helper = store
+
 [pull]
 	ff = only

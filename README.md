@@ -6,7 +6,7 @@ These are my dotfiles. They use the python [`dotfiles`](https://github.com/jbern
 
 Or on macOS:
 
-	brew install python neovim git
+	brew install python neovim git git-delta
 
 
 ## Clone & Setup
