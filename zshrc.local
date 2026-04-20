@@ -1,13 +1,15 @@
 #export PATH=~/bin:~/.bin/:~/.emacs.d/bin:/usr/local/bin:/usr/local/texlive/2022/bin/universal-darwin:/Library/TeX/texbin:$PATH
-export PATH=$(brew --prefix python@3.12)/libexec/bin:$PATH
-export PATH="/opt/homebrew/opt/postgresql@17/bin:$PATH"
-
-source "$(brew --prefix)/share/google-cloud-sdk/path.zsh.inc"
-source "$(brew --prefix)/share/google-cloud-sdk/completion.zsh.inc"
 
 eval "$(starship init zsh)"
 
+source "$(brew --prefix)/share/google-cloud-sdk/path.zsh.inc"
+source "$(brew --prefix)/share/google-cloud-sdk/completion.zsh.inc"
 alias cloudgod='export GOOGLE_APPLICATION_CREDENTIALS="$HOME/.config/gcloud/adc_admin.json"'
+
+eval "$(/usr/libexec/path_helper)"
+export PATH=$(brew --prefix python)/libexec/bin:$PATH
+export PATH=$(brew --prefix ruby)/bin:$PATH
+export PATH=$(brew --prefix postgresql)/bin:$PATH
 
 # Just to make sure we're using UTF-8 here
 #export LANG="en_US.UTF-8"
@@ -66,7 +68,7 @@ alias ts=timestamp2date
 alias a="sudo apt"
 
 function paperless {
-       scp "$1" ndreke.de:~/paperless/consume
+       scp "$1" moabit:~/paperless/consume
 }
 
 if [[ $TERM == "alacritty" ]]; then
