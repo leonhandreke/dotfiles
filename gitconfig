@@ -48,7 +48,6 @@
 
 [delta]
         navigate = true
-        dark = true
 
 [merge]
         conflictStyle = zdiff3
@@ -65,9 +64,6 @@
 [alias]
         co = checkout
         b = checkout --track -b
-
-[credential]
-        helper = store
 
 [pull]
         ff = only
