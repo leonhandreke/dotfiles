@@ -12,9 +12,7 @@
         algorithm = histogram
         colorMoved = plain
         mnemonicPrefix = true
-        renames = true
 [push]
-        default = simple
         autoSetupRemote = true
         followTags = true
 [fetch]
@@ -36,47 +34,40 @@
 
 [core]
         excludesfile = ~/.gitignore
+        editor = vim
+        autocrlf = input
+        pager = delta
 
 [rebase]
         autoSquash = true
         autoStash = true
-	updateRefs = true
-
-
-[user]
-	name = Leon Handreke
-	email = leonh@ndreke.de
-	signingkey = 02497EB1
-	sign-commits = true
-
-[core]
-	editor = vim
-	autocrlf = input
-        pager = delta
+        updateRefs = true
 
 [interactive]
         diffFilter = delta --color-only
 
 [delta]
-        navigate = true  # use n and N to move between diff sections
-        dark = true      # or light = true, or omit for auto-detection
+        navigate = true
+        dark = true
 
 [merge]
         conflictStyle = zdiff3
 
-[github]
-	user = leonhandreke
+[user]
+        name = Leon Handreke
+        email = leonh@ndreke.de
+        signingkey = 02497EB1
+        sign-commits = true
 
-[push]
-	default = simple
-	autoSetupRemote = true
+[github]
+        user = leonhandreke
 
 [alias]
-	co = checkout
-	b = checkout --track -b
+        co = checkout
+        b = checkout --track -b
 
 [credential]
-	helper = store
+        helper = store
 
 [pull]
-	ff = only
+        ff = only
