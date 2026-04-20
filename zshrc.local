@@ -2,8 +2,10 @@
 
 eval "$(starship init zsh)"
 
-source "$(brew --prefix)/share/google-cloud-sdk/path.zsh.inc"
-source "$(brew --prefix)/share/google-cloud-sdk/completion.zsh.inc"
+if [[ -d "$(brew --prefix)/share/google-cloud-sdk" ]]; then
+  source "$(brew --prefix)/share/google-cloud-sdk/path.zsh.inc"
+  source "$(brew --prefix)/share/google-cloud-sdk/completion.zsh.inc"
+fi
 alias cloudgod='export GOOGLE_APPLICATION_CREDENTIALS="$HOME/.config/gcloud/adc_admin.json"'
 
 eval "$(/usr/libexec/path_helper)"
